@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 import richardson_image_handlers
-from richardson_file_handlers import load_data, save_image
+from richardson_file_handlers import load_data, save_image, get_file_list
 
 DATA_PATH = "[target_dir\\validation]\\" # data file will be in current director for this assignment
 META_PATH = "[target_dir\\validation]\\Validation Meta data"
@@ -24,26 +24,50 @@ DEFN_FILE = "mySettings.csv"
 
 # get the human labels
 human_labels = {
-		"/m/02p0tk3" : "human",
-        "/m/01g317" : "human"
+#		"/m/02p0tk3" : "Human body"
+   #     "/m/01g317" : "Person"
+		"/m/04yx4" : "Man",
+		"/m/03bt1vf": "Woman"
 	}
 
-#get list of images to load
+#get list of images to load, based on jpg in file directory
+#img_list = get_file_list(DATA_PATH)
+
+#get list of images with human labels first
+# get the bounding boxes
+boxes = load_data(META_FILE, META_PATH)
+
+img_list = []
+for label_name in human_labels:
+	rows_human = boxes.loc[boxes.LabelName == label_name]
+	
+	#create a list
+	for row in rows_human.ImageID:
+		img_list.append(row)
 
 
 # select rows with ImageID
-img_id = "00a159a661a2f5aa"
+#img_id = "00a159a661a2f5aa"
 
-# get the bounding boxs for human label
-boxes = load_data(META_FILE, META_PATH)
+for img_id in img_list:
+	#img_id = img_list[2]
 
-print(boxes.head())
-select_rows = boxes.loc[boxes.ImageID == img_id]
+	#remove extension
+	img_id = img_id.split('.')[0]
 
-target_rows = richardson_image_handlers.cut_out_target(human_labels, select_rows)
-img_clipped = richardson_image_handlers.create_clipped_images(img_id, DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
+	select_rows = boxes.loc[boxes.ImageID == img_id]
+	if (len(select_rows.index)== 0):
+		continue
+	#print(select_rows)
 
-#save to file
-clip_index = 1
-save_image(str(clip_index) + '_' + str(img_id) + '.jpg', TRAIN_PATH, img_clipped)
+	target_rows = richardson_image_handlers.cut_out_target(human_labels, select_rows)
+
+	#print(target_rows)
+	img_clipped, flag_success = richardson_image_handlers.create_clipped_images(img_id, DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
+
+	if (flag_success):
+		#save to file
+		clip_index = 1
+		print("Saving image!")
+		save_image(str(clip_index) + '_' + str(img_id) + '.jpg', TRAIN_PATH, img_clipped)
 

@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+import os
+import glob
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
 from keras.preprocessing.image import save_img
@@ -30,5 +32,14 @@ def load_data(datafile, path = ''):
     csv_path = os.path.join(path, datafile)
     print("loading file " + csv_path)
     return pd.read_csv(csv_path, encoding='latin-1')
+
+#get list of files in a directory
+def get_file_list(path = "", ext = "jpg"):
+
+    file_list = []
+    for root, dirs, files in os.walk(path):
+        file_list = file_list + files
+
+    return file_list
 
 

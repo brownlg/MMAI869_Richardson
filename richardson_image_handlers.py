@@ -13,12 +13,21 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
     print("Image height: " + str(height))
     print("Image width: "+  str(width))
 
+    flag_success = False
     for index, row in target_rows.iterrows():
         img_clipped = my_img[0, int(height * row['YMin']) : int(height * row['YMax']), 
                                 int(width * row['XMin']) : int(width * row['XMax']), :]
 
         img_clipped = zoom_to_fit_box(IMG_WINDOW_X, IMG_WINDOW_Y, img_clipped)
-    return img_clipped 
+        flag_success = True
+
+    # check to make sure image taller than wide
+    height, width, color = img_clipped.shape
+
+    if ((height*.75) < width):
+         flag_success = False
+
+    return img_clipped, flag_success
 
 def zoom_to_fit_box(box_width, box_height, my_image):
     img_height, img_width, img__color = my_image.shape
@@ -46,12 +55,18 @@ def zoom_to_fit_box(box_width, box_height, my_image):
         zoom_y = float(box_height) / float(img_height)
         
         #calculate window zoom up with X
+        new_width = int(zoom_x * img_width)
         
         #calcaulte window zoom up with Y
-        
-        #decide which window fits
+        new_height = int(zoom_y * img_height)
 
-        return 0     
+        #decide which window fits
+        if (new_width > img_width):
+            zoom = zoom_y
+        else:
+            zoom = zoom_x
+
+        return cv2.resize(my_image, dsize=(int(zoom * img_width), int(zoom * img_height)), interpolation=cv2.INTER_CUBIC)
 
     #no change to image required
     return my_image
