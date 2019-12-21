@@ -28,7 +28,7 @@ TRAIN_TEST_VALIDATION_DISTRIBUTION = (.70, .10, .20)
 IMG_WINDOW_X = 100
 IMG_WINDOW_Y = 300
 
-COLLECT_MAX = 5 #select how many images you want total
+COLLECT_MAX = 100 #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 
@@ -83,35 +83,37 @@ for img_id in img_list:
 	clipped_images = richardson_image_handlers.create_clipped_images(img_id, DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
 
 	clip_index = 0
+	r = random()
+	# split data into train, test, validation
+	if (r < TRAIN_TEST_VALIDATION_DISTRIBUTION[0]):
+		flag_data_for = TRAIN_PATH
+	elif (r < (TRAIN_TEST_VALIDATION_DISTRIBUTION[2]+TRAIN_TEST_VALIDATION_DISTRIBUTION[0])):
+		flag_data_for =  VALIDATION_PATH
+	else:
+		flag_data_for = TEST_PATH
+
 	for clip_dict in clipped_images:	
 		key = list(clip_dict)[0]
 		img_clipped = clip_dict[key]
-		#for clip in clipped_images:
-            #    key = list(clip)[0]
-            #    img_clipped = clip[key]
 
 		#save to file
 		clip_index = clip_index + 1
 		print("Saving image!")
-		r = random()
-
-		flag_data_for = ''
-		clipfilename = str(img_id) + '_' +  str(clip_index) + '.jpg'
-		# split data into train, test, validation
-		if (r < TRAIN_TEST_VALIDATION_DISTRIBUTION[0]):
-			flag_data_for = TRAIN_PATH
-		elif (r < (TRAIN_TEST_VALIDATION_DISTRIBUTION[2]+TRAIN_TEST_VALIDATION_DISTRIBUTION[0])):
-			flag_data_for =  VALIDATION_PATH
+		
+		if (key == 'non-target'):
+			identify_non_target = "F"
 		else:
-			flag_data_for = TEST_PATH
-			
+			identify_non_target = ""
+		
+		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.jpg'
+		
 		# store data
 		save_image(clipfilename, flag_data_for, img_clipped)
 
 		my_logger.write_line(flag_data_for + "," + key + "," + clipfilename + "\n")	
 		
-		# track how many images you have
-		total_collection = total_collection + 1
-		if (total_collection > COLLECT_MAX):
-			break
+	# track how many images you have
+	total_collection = total_collection + 1
+	if (total_collection > COLLECT_MAX):
+		break
 

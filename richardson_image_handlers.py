@@ -2,6 +2,7 @@ import richardson_file_handlers as file_handler
 import pandas as pd
 import cv2
 import random as random
+from bbox.metrics import jaccard_index_2d, BBox2D
 
 
 def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y):        
@@ -52,12 +53,17 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
             continue
 
         #does this clip fall inside target clips?
+
+      
+
         flag_inside = False
         for index, row in target_rows.iterrows():  
-            if (    (x_min > int(width * row['XMin'])) 
-                and (x_min < int(width * row['XMin'])) 
-                and (y_min > int(width * row['XMin']))                
-                and (y_max < int(width * row['XMin']))):
+            box1 = BBox2D([x_min, y_min, x_max, y_max])
+            box2 = BBox2D([int(width * row['XMin']), int (height * row['YMin']), int(width * row['XMax']), int(height * row['YMax'] )])
+
+            iou = jaccard_index_2d(box1, box2)
+
+            if (iou > 0):
                 flag_inside = True
                 break
 
