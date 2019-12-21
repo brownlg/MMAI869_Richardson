@@ -83,7 +83,13 @@ for img_id in img_list:
 	clipped_images = richardson_image_handlers.create_clipped_images(img_id, DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
 
 	clip_index = 0
-	for img_clipped in clipped_images:		
+	for clip_dict in clipped_images:	
+		key = list(clip_dict)[0]
+		img_clipped = clip_dict[key]
+		#for clip in clipped_images:
+            #    key = list(clip)[0]
+            #    img_clipped = clip[key]
+
 		#save to file
 		clip_index = clip_index + 1
 		print("Saving image!")
@@ -101,7 +107,8 @@ for img_id in img_list:
 			
 		# store data
 		save_image(clipfilename, flag_data_for, img_clipped)
-		my_logger.write_line(flag_data_for + "," + "1," + clipfilename + "\n")	
+
+		my_logger.write_line(flag_data_for + "," + key + "," + clipfilename + "\n")	
 		
 		# track how many images you have
 		total_collection = total_collection + 1

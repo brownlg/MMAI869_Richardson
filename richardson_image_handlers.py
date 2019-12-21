@@ -32,8 +32,7 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
             # if the image meets aspect ratio requirements than add it
             clipped_images.append({ row['LabelName']: img_clipped })
 
-    #now add some non-target images at 1:3 ratio (i.e 3 negatives for 1 positive)
-    MAX_TRY = len(clipped_images.index) * 3
+    MAX_TRY = len(clipped_images) * 3
     success = 0
     for i in range(0, 100): # randomly select 100 clips to try and get MAX_TRY images
         if (success >= MAX_TRY):
@@ -52,9 +51,28 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
         if (x_max > width):
             continue
 
+        #does this clip fall inside target clips?
+        flag_inside = False
+        for index, row in target_rows.iterrows():  
+            if (    (x_min > int(width * row['XMin'])) 
+                and (x_min < int(width * row['XMin'])) 
+                and (y_min > int(width * row['XMin']))                
+                and (y_max < int(width * row['XMin']))):
+                flag_inside = True
+                break
+
+        if (flag_inside):
+            continue
+
+        #clip this image because it is not in the target box
         img_clipped = my_img[0, y_min : y_max, 
-                                x_min : x_max, :]
+                                    x_min : x_max, :]
+
+        success = success + 1
+        clipped_images.append({ 'non-target' : img_clipped })
+
         
+                   
 
     return clipped_images
 
