@@ -1,6 +1,7 @@
 import richardson_file_handlers as file_handler
 import pandas as pd
 import cv2
+import random as random
 
 
 def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y):        
@@ -12,23 +13,57 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
     print("Image height: " + str(height))
     print("Image width: "+  str(width))
 
+    # first add the target images
     clipped_images = [] #list    
     for index, row in target_rows.iterrows():  
         img_clipped = my_img[0, int(height * row['YMin']) : int(height * row['YMax']), 
                                 int(width * row['XMin']) : int(width * row['XMax']), :]
 
         img_clipped = zoom_to_fit_box(IMG_WINDOW_X, IMG_WINDOW_Y, img_clipped)
+
+        img_height, img_width, img__color = img_clipped.shape
+
+        if ((img_width == 0) or (img_height ==0)):
+            continue
        
         # check to make sure image taller than wide
-        height, width, color = img_clipped.shape        
-        if ((height*.75) < width):
+        img_height, img_width, img__color = img_clipped.shape
+        if ((img_height*.75) > img_width):
             # if the image meets aspect ratio requirements than add it
-            clipped_images.append(img_clipped)
+            clipped_images.append({ row['LabelName']: img_clipped })
+
+    #now add some non-target images at 1:3 ratio (i.e 3 negatives for 1 positive)
+    MAX_TRY = len(clipped_images.index) * 3
+    success = 0
+    for i in range(0, 100): # randomly select 100 clips to try and get MAX_TRY images
+        if (success >= MAX_TRY):
+            break
+
+        #select a clip that is not in target
+        y_min = int (random.randint(0, height-IMG_WINDOW_Y))
+        x_min = int (random.randint(0, width-IMG_WINDOW_X))
+
+        y_max = IMG_WINDOW_Y + y_min
+        x_max = IMG_WINDOW_X + x_min
+
+        #exception handling, should not happen
+        if (y_max > height): 
+            continue
+        if (x_max > width):
+            continue
+
+        img_clipped = my_img[0, y_min : y_max, 
+                                x_min : x_max, :]
+        
 
     return clipped_images
 
-def zoom_to_fit_box(box_width, box_height, my_image):
+def zoom_to_fit_box(box_width, box_height, my_image):    
     img_height, img_width, img__color = my_image.shape
+
+    if ((img_width == 0) or (img_height ==0)):
+        return my_image
+    
 
     #too big 
     flag_too_big_horizontal = (img_width > box_width)

@@ -28,6 +28,8 @@ TRAIN_TEST_VALIDATION_DISTRIBUTION = (.70, .10, .20)
 IMG_WINDOW_X = 100
 IMG_WINDOW_Y = 300
 
+COLLECT_MAX = 5 #select how many images you want total
+
 DEFN_FILE = "mySettings.csv"
 
 # get the human labels
@@ -60,8 +62,10 @@ for label_name in human_labels:
 from Richardson_Logger import r_logger
 my_logger = r_logger.R_logger(INFO_PATH + '\\' + "data.csv")
 my_logger.clear()
-my_logger.write_line("tvt" + "," + "flag_person" + "imgid")
+my_logger.write_line("tvt,flag_person,imgid\n")
 
+
+total_collection = 0  # keep track of how many images are in your dataset
 for img_id in img_list:
 	#img_id = img_list[2]
 
@@ -86,17 +90,21 @@ for img_id in img_list:
 		r = random()
 
 		flag_data_for = ''
-		clipfilename = str(clip_index) + '_' + str(img_id) + '.jpg'
+		clipfilename = str(img_id) + '_' +  str(clip_index) + '.jpg'
 		# split data into train, test, validation
 		if (r < TRAIN_TEST_VALIDATION_DISTRIBUTION[0]):
-			flag_data_for = 'TRAIN'
-			save_image(clipfilename, TRAIN_PATH, img_clipped)
+			flag_data_for = TRAIN_PATH
 		elif (r < (TRAIN_TEST_VALIDATION_DISTRIBUTION[2]+TRAIN_TEST_VALIDATION_DISTRIBUTION[0])):
-			flag_data_for = 'VALIDATION'
-			save_image(clipfilename, VALIDATION_PATH, img_clipped)
+			flag_data_for =  VALIDATION_PATH
 		else:
-			flag_data_for = 'TEST'
-			save_image(clipfilename, TEST_PATH, img_clipped)
-
+			flag_data_for = TEST_PATH
+			
 		# store data
-		my_logger.write_line(flag_data_for + "," + "1" + clipfilename + "\n")		
+		save_image(clipfilename, flag_data_for, img_clipped)
+		my_logger.write_line(flag_data_for + "," + "1," + clipfilename + "\n")	
+		
+		# track how many images you have
+		total_collection = total_collection + 1
+		if (total_collection > COLLECT_MAX):
+			break
+
