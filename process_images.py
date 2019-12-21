@@ -6,16 +6,20 @@
 
 import pandas as pd
 import numpy as np
+from random import random
 
 import richardson_image_handlers
 from richardson_file_handlers import load_data, save_image, get_file_list
 
-DATA_PATH = "[target_dir\\validation]\\" # data file will be in current director for this assignment
+DATA_PATH = "[target_dir\\validation]\\" 
 META_PATH = "[target_dir\\validation]\\Validation Meta data"
 META_FILE = "validation-annotations-bbox.csv"
 
 TRAIN_PATH = 'richardson_images_train_set'
-TEST_PATH = ''
+TEST_PATH = 'richardson_images_test_set'
+VALIDATION_PATH = 'richardson_images_validation_set'
+
+TRAIN_TEST_VALIDATION_DISTRIBUTION = (70, 10, 20)
 
 IMG_WINDOW_X = 100
 IMG_WINDOW_Y = 300
@@ -69,5 +73,14 @@ for img_id in img_list:
 		#save to file
 		clip_index = 1
 		print("Saving image!")
-		save_image(str(clip_index) + '_' + str(img_id) + '.jpg', TRAIN_PATH, img_clipped)
+		r = random()
+
+		# split data into train, test, validation
+		if (r < TRAIN_TEST_VALIDATION_DISTRIBUTION[0]):
+			save_image(str(clip_index) + '_' + str(img_id) + '.jpg', TRAIN_PATH, img_clipped)
+		elif (r < (TRAIN_TEST_VALIDATION_DISTRIBUTION[2]+TRAIN_TEST_VALIDATION_DISTRIBUTION[0])):
+			save_image(str(clip_index) + '_' + str(img_id) + '.jpg', VALIDATION_PATH, img_clipped)
+		else:
+			save_image(str(clip_index) + '_' + str(img_id) + '.jpg', TEST_PATH, img_clipped)
+
 
