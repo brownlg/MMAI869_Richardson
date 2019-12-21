@@ -3,31 +3,29 @@ import pandas as pd
 import cv2
 
 
-def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y):
-        
+def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y):        
     # copy the bounding box to new image
+    
     # load the image
     my_img = file_handler.load_image(filepath + img_id + ".jpg")
-
-    index, height, width, color = my_img.shape
+    index, height, width, color = my_img.shape        
     print("Image height: " + str(height))
     print("Image width: "+  str(width))
 
-    flag_success = False
-    for index, row in target_rows.iterrows():
+    clipped_images = [] #list    
+    for index, row in target_rows.iterrows():  
         img_clipped = my_img[0, int(height * row['YMin']) : int(height * row['YMax']), 
                                 int(width * row['XMin']) : int(width * row['XMax']), :]
 
         img_clipped = zoom_to_fit_box(IMG_WINDOW_X, IMG_WINDOW_Y, img_clipped)
-        flag_success = True
+       
+        # check to make sure image taller than wide
+        height, width, color = img_clipped.shape        
+        if ((height*.75) < width):
+            # if the image meets aspect ratio requirements than add it
+            clipped_images.append(img_clipped)
 
-    # check to make sure image taller than wide
-    height, width, color = img_clipped.shape
-
-    if ((height*.75) < width):
-         flag_success = False
-
-    return img_clipped, flag_success
+    return clipped_images
 
 def zoom_to_fit_box(box_width, box_height, my_image):
     img_height, img_width, img__color = my_image.shape

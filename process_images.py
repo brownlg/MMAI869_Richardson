@@ -10,7 +10,10 @@ from random import random
 
 import richardson_image_handlers
 from richardson_file_handlers import load_data, save_image, get_file_list
+import Richardson_Logger
 
+
+#setup paths
 DATA_PATH = "[target_dir\\validation]\\" 
 META_PATH = "[target_dir\\validation]\\Validation Meta data"
 META_FILE = "validation-annotations-bbox.csv"
@@ -18,8 +21,9 @@ META_FILE = "validation-annotations-bbox.csv"
 TRAIN_PATH = 'richardson_images_train_set'
 TEST_PATH = 'richardson_images_test_set'
 VALIDATION_PATH = 'richardson_images_validation_set'
+INFO_PATH = 'richardson_info_files'
 
-TRAIN_TEST_VALIDATION_DISTRIBUTION = (70, 10, 20)
+TRAIN_TEST_VALIDATION_DISTRIBUTION = (.70, .10, .20)
 
 IMG_WINDOW_X = 100
 IMG_WINDOW_Y = 300
@@ -53,6 +57,11 @@ for label_name in human_labels:
 # select rows with ImageID
 #img_id = "00a159a661a2f5aa"
 
+from Richardson_Logger import r_logger
+my_logger = r_logger.R_logger(INFO_PATH + '\\' + "data.csv")
+my_logger.clear()
+my_logger.write_line("tvt" + "," + "flag_person" + "imgid")
+
 for img_id in img_list:
 	#img_id = img_list[2]
 
@@ -67,20 +76,27 @@ for img_id in img_list:
 	target_rows = richardson_image_handlers.cut_out_target(human_labels, select_rows)
 
 	#print(target_rows)
-	img_clipped, flag_success = richardson_image_handlers.create_clipped_images(img_id, DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
+	clipped_images = richardson_image_handlers.create_clipped_images(img_id, DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
 
-	if (flag_success):
+	clip_index = 0
+	for img_clipped in clipped_images:		
 		#save to file
-		clip_index = 1
+		clip_index = clip_index + 1
 		print("Saving image!")
 		r = random()
 
+		flag_data_for = ''
+		clipfilename = str(clip_index) + '_' + str(img_id) + '.jpg'
 		# split data into train, test, validation
 		if (r < TRAIN_TEST_VALIDATION_DISTRIBUTION[0]):
-			save_image(str(clip_index) + '_' + str(img_id) + '.jpg', TRAIN_PATH, img_clipped)
+			flag_data_for = 'TRAIN'
+			save_image(clipfilename, TRAIN_PATH, img_clipped)
 		elif (r < (TRAIN_TEST_VALIDATION_DISTRIBUTION[2]+TRAIN_TEST_VALIDATION_DISTRIBUTION[0])):
-			save_image(str(clip_index) + '_' + str(img_id) + '.jpg', VALIDATION_PATH, img_clipped)
+			flag_data_for = 'VALIDATION'
+			save_image(clipfilename, VALIDATION_PATH, img_clipped)
 		else:
-			save_image(str(clip_index) + '_' + str(img_id) + '.jpg', TEST_PATH, img_clipped)
+			flag_data_for = 'TEST'
+			save_image(clipfilename, TEST_PATH, img_clipped)
 
-
+		# store data
+		my_logger.write_line(flag_data_for + "," + "1" + clipfilename + "\n")		
