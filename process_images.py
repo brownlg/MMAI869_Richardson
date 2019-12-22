@@ -28,7 +28,7 @@ TRAIN_TEST_VALIDATION_DISTRIBUTION = (.70, .10, .20)
 IMG_WINDOW_X = 100
 IMG_WINDOW_Y = 300
 
-COLLECT_MAX = 100 #select how many images you want total
+COLLECT_MAX = 10000000 #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 
@@ -98,7 +98,7 @@ for img_id in img_list:
 
 		#save to file
 		clip_index = clip_index + 1
-		print("Saving image!")
+		#print("Saving image!")
 		
 		if (key == 'non-target'):
 			identify_non_target = "F"
