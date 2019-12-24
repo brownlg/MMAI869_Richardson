@@ -19,6 +19,8 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
     # first add the target images
     clipped_images = [] #list    
     for index, row in target_rows.iterrows():  
+         
+
         img_clipped = my_img[0, int(height * row['YMin']) : int(height * row['YMax']), 
                                 int(width * row['XMin']) : int(width * row['XMax']), :]
 
@@ -53,7 +55,6 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
             alpha_channel = np.ones(b_channel.shape, dtype=b_channel.dtype) * 255 #creating a dummy alpha channel image.
             img_background_RGBA = cv2.merge((r_channel, g_channel, b_channel, alpha_channel))
 
-
             #now paste the img on the background
             alpha = 1.0
             beta = 1.0
@@ -72,42 +73,33 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
             if (flag_error == False):
                 value = [0, 0, 0, 0]
                 target = cv2.copyMakeBorder(img_clipped_RGBA, top, bottom, left, right, borderType, None, value)
+                target = stretch_to_fit_box(target, IMG_WINDOW_X, IMG_WINDOW_Y)
+                target = stamp_image(target, img_background_RGBA)
+                blurred_transition = np.copy(target)
 
                 #now blur the edges of the photo for nice transition to background
-                for i in range(0,5):                
-                    blurred_transition = cv2.GaussianBlur(target,(BLUR_SIZE,BLUR_SIZE),cv2.BORDER_DEFAULT)
-                                
+                for i in range(0,2):                
+                    blurred_transition = cv2.GaussianBlur(blurred_transition,(5,5),cv2.BORDER_DEFAULT)
+            
                 #mask out the middle
-                EDGE_MIX = 1.2
-                #erase
+                EDGE_MIX = 1.4
+                #erase                
                 cv2.rectangle(blurred_transition,(int(left * EDGE_MIX), int(top * EDGE_MIX)), (int(IMG_WINDOW_X - right * EDGE_MIX), int(IMG_WINDOW_Y - bottom * EDGE_MIX)), (0, 0, 0, 255), -1)
-
                 #make transparent
                 cv2.rectangle(blurred_transition,(int(left * EDGE_MIX), int(top * EDGE_MIX)), (int(IMG_WINDOW_X - right * EDGE_MIX), int(IMG_WINDOW_Y - bottom * EDGE_MIX)), (0, 0, 0, 0), -1)
 
-                file_handler.save_image("blurred_transition.png", "", blurred_transition, True)
-                file_handler.save_image("target.png", "", target, True)
-                #target_with_blurry_edge = cv2.addWeighted(blurred_transition, alpha, target, beta, 0)    
-
-                # Now create a mask of logo and create its inverse mask also
-                img2gray = cv2.cvtColor(blurred_transition, cv2.COLOR_BGR2GRAY)
-                ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
-                mask_inv = cv2.bitwise_not(mask) 
-
-                # Now black-out the area of logo in ROI
-               # new_back = cv2.bitwise_and(target, target, mask = mask_inv)
-                
-                target_with_blurry_edge = cv2.bitwise_or(blurred_transition, target)    
-
-                file_handler.save_image("new_back.png", "", img2gray, True)             
-                file_handler.save_image("blurred_transition_edge.png", "", target_with_blurry_edge, True)             
+                #add the images
+                target_with_blurry_edge = stamp_image(blurred_transition, target)
 
             #resize just incase due to rounding errors
             target_with_blurry_edge = stretch_to_fit_box(target_with_blurry_edge, IMG_WINDOW_X, IMG_WINDOW_Y)
-            # first image is on top
-            target2 = cv2.addWeighted( target_with_blurry_edge, alpha, img_background_RGBA, beta, 0)          
-
+           
+            # first image is on top            
+            target2 = stamp_image(target_with_blurry_edge, img_background_RGBA)
             clipped_images.append({ row['LabelName']: target2 })
+          #  file_handler.save_image("boutput.png", "", target2, True)           
+          #  file_handler.save_image("bedge.png", "", target_with_blurry_edge, True)     
+          #  file_handler.save_image("bbackbround.png", "", img_background_RGBA, True)          
 
     # create false targets
     MAX_TRY = len(clipped_images) * 3
@@ -155,6 +147,21 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
           
 
     return clipped_images
+
+def stamp_image(img_fg, img_bg):
+    # Now create a mask of foreground
+    img2gray = cv2.cvtColor(img_fg.astype('uint8'), cv2.COLOR_BGR2GRAY)
+    ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
+    mask_inv = cv2.bitwise_not(mask) 
+
+    # Now black-out the area of logo in ROI
+    img_bg = cv2.bitwise_and(img_bg.astype('uint8'), img_bg.astype('uint8'), mask = mask_inv)
+
+    # mask select only relevant position
+    img_fg = cv2.bitwise_and(img_fg.astype('uint8'), img_fg.astype('uint8'), mask = mask)
+
+    #add the images       
+    return cv2.add(img_fg.astype('uint8'), img_bg.astype('uint8'))
 
 def stretch_to_fit_box(my_image, box_width, box_height):
     img_height, img_width, img__color = my_image.shape
