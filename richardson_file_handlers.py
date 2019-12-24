@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 import os
 import glob
@@ -22,8 +23,13 @@ def load_image(datafile, path = ""):
     return x
 
 #save image
-def save_image(filename, path = "", image_data = None):
-    save_img(os.path.join(path, filename), image_data)
+def save_image(filename, path = "", image_data = None, flag_png = False):
+    if (flag_png == False):
+        save_img(os.path.join(path, filename), image_data)
+    else:
+        myfile = filename.split('.')[0]
+        myfile = myfile + ".png"        
+        save_img(os.path.join(path, myfile), image_data)
     return True
 
 
@@ -41,5 +47,23 @@ def get_file_list(path = "", ext = "jpg"):
         file_list = file_list + files
 
     return file_list
+
+def load_images_for_keras(file_path="", ext = "jpg"):
+    file_list = []
+    
+    for root, dirs, files in os.walk(file_path):
+        file_list = file_list + files
+
+    flag_first = True
+    for file_name in file_list:
+        # open the file add to array
+        img = load_image(file_name, file_path)  # this is a PIL image
+        if (flag_first):
+            img_arr = img
+            flag_first = False
+        else:
+            img_arr = np.append(img_arr, img, axis=0)
+
+    return img_arr
 
 

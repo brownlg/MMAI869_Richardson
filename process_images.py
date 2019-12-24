@@ -12,18 +12,9 @@ import richardson_image_handlers
 from richardson_file_handlers import load_data, save_image, get_file_list
 import Richardson_Logger
 
+import richardson_path
 
-#setup paths
-DATA_PATH = "[target_dir\\validation]\\" 
-META_PATH = "[target_dir\\validation]\\Validation Meta data"
-META_FILE = "validation-annotations-bbox.csv"
-
-TRAIN_PATH = 'richardson_images_train_set'
-TEST_PATH = 'richardson_images_test_set'
-VALIDATION_PATH = 'richardson_images_validation_set'
-INFO_PATH = 'richardson_info_files'
-
-TRAIN_TEST_VALIDATION_DISTRIBUTION = (.70, .10, .20)
+TRAIN_TEST_VALIDATION_DISTRIBUTION = (1.0, 0, 0)
 
 IMG_WINDOW_X = 100
 IMG_WINDOW_Y = 300
@@ -45,7 +36,7 @@ human_labels = {
 
 #get list of images with human labels first
 # get the bounding boxes
-boxes = load_data(META_FILE, META_PATH)
+boxes = load_data(richardson_path.META_FILE, richardson_path.META_PATH)
 
 img_list = []
 for label_name in human_labels:
@@ -60,7 +51,7 @@ for label_name in human_labels:
 #img_id = "00a159a661a2f5aa"
 
 from Richardson_Logger import r_logger
-my_logger = r_logger.R_logger(INFO_PATH + '\\' + "data.csv")
+my_logger = r_logger.R_logger(richardson_path.INFO_PATH + '\\' + "data.csv")
 my_logger.clear()
 my_logger.write_line("tvt,flag_person,imgid\n")
 
@@ -80,17 +71,17 @@ for img_id in img_list:
 	target_rows = richardson_image_handlers.cut_out_target(human_labels, select_rows)
 
 	#print(target_rows)
-	clipped_images = richardson_image_handlers.create_clipped_images(img_id, DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
+	clipped_images = richardson_image_handlers.create_clipped_images(img_id, richardson_path.DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
 
 	clip_index = 0
 	r = random()
 	# split data into train, test, validation
 	if (r < TRAIN_TEST_VALIDATION_DISTRIBUTION[0]):
-		flag_data_for = TRAIN_PATH
+		flag_data_for = richardson_path.TRAIN_PATH
 	elif (r < (TRAIN_TEST_VALIDATION_DISTRIBUTION[2]+TRAIN_TEST_VALIDATION_DISTRIBUTION[0])):
-		flag_data_for =  VALIDATION_PATH
+		flag_data_for =  richardson_path.VALIDATION_PATH
 	else:
-		flag_data_for = TEST_PATH
+		flag_data_for = richardson_path.TEST_PATH
 
 	for clip_dict in clipped_images:	
 		key = list(clip_dict)[0]
@@ -108,7 +99,7 @@ for img_id in img_list:
 		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.jpg'
 		
 		# store data
-		save_image(clipfilename, flag_data_for, img_clipped)
+		save_image(clipfilename, flag_data_for, img_clipped, True) # needs to be png
 
 		my_logger.write_line(flag_data_for + "," + key + "," + clipfilename + "\n")	
 		
