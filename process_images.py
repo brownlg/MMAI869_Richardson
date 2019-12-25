@@ -14,22 +14,15 @@ import Richardson_Logger
 
 import richardson_path
 
-TRAIN_TEST_VALIDATION_DISTRIBUTION = (1.0, 0, 0)
+TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.7, 0.2, 0.1)
 
-IMG_WINDOW_X = 100
-IMG_WINDOW_Y = 300
+IMG_WINDOW_X = 20
+IMG_WINDOW_Y = 60
 
 COLLECT_MAX = 10000000 #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 
-# get the human labels
-human_labels = {
-#		"/m/02p0tk3" : "Human body"
-   #     "/m/01g317" : "Person"
-		"/m/04yx4" : "Man",
-		"/m/03bt1vf": "Woman"
-	}
 
 #get list of images to load, based on jpg in file directory
 #img_list = get_file_list(DATA_PATH)
@@ -39,7 +32,7 @@ human_labels = {
 boxes = load_data(richardson_path.META_FILE, richardson_path.META_PATH)
 
 img_list = []
-for label_name in human_labels:
+for label_name in richardson_path.human_labels:
 	rows_human = boxes.loc[boxes.LabelName == label_name]
 	
 	#create a list
@@ -68,7 +61,7 @@ for img_id in img_list:
 		continue
 	#print(select_rows)
 
-	target_rows = richardson_image_handlers.cut_out_target(human_labels, select_rows)
+	target_rows = richardson_image_handlers.cut_out_target(richardson_path.human_labels, select_rows)
 
 	#print(target_rows)
 	clipped_images = richardson_image_handlers.create_clipped_images(img_id, richardson_path.DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
@@ -96,9 +89,10 @@ for img_id in img_list:
 		else:
 			identify_non_target = ""
 		
-		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.jpg'
+		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.png'
 		
 		# store data
+		#print(img_clipped.shape)
 		save_image(clipfilename, flag_data_for, img_clipped, True) # needs to be png
 
 		my_logger.write_line(flag_data_for + "," + key + "," + clipfilename + "\n")	

@@ -7,113 +7,31 @@ from bbox.metrics import jaccard_index_2d, BBox2D
 
 BLUR_SIZE = 21
 
-def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y):        
-    # copy the bounding box to new image
-    
-    # load the image
-    my_img = file_handler.load_image(filepath + img_id + ".jpg")
-    index, height, width, color = my_img.shape        
-    print("Image height: " + str(height))
-    print("Image width: "+  str(width))
+DEBUG_MODE = False
 
-    # first add the target images
-    clipped_images = [] #list    
-    for index, row in target_rows.iterrows():  
-         
 
-        img_clipped = my_img[0, int(height * row['YMin']) : int(height * row['YMax']), 
-                                int(width * row['XMin']) : int(width * row['XMax']), :]
-
-        img_clipped = zoom_to_fit_box(IMG_WINDOW_X, IMG_WINDOW_Y, img_clipped)
-
-        img_height, img_width, img__color = img_clipped.shape
-
-        if ((img_width == 0) or (img_height ==0)):
-            continue
-       
-        # check to make sure image taller than wide
-        img_height, img_width, img__color = img_clipped.shape
-        if ((img_height*.75) > img_width):
-            # if the image meets aspect ratio requirements than add it
-            #now you need to process the image so that it fits window size
-            img_background = np.copy(img_clipped)
-
-            #stretch it to fit the window
-            img_background = stretch_to_fit_box(img_background, IMG_WINDOW_X, IMG_WINDOW_Y)
-
-            #blurr it severely
-            #src = cv2.imread('flower.jpg', cv2.IMREAD_UNCHANGED)
-            for i in range(0,10):                
-                img_background = cv2.GaussianBlur(img_background,(BLUR_SIZE,BLUR_SIZE),cv2.BORDER_DEFAULT)
-
-            # add alpha channel to both images
-            r_channel, g_channel, b_channel = cv2.split(img_clipped)
-            alpha_channel = np.ones(b_channel.shape, dtype=b_channel.dtype) * 255 #creating a dummy alpha channel image.
-            img_clipped_RGBA = cv2.merge((r_channel, g_channel, b_channel, alpha_channel))
-
-            r_channel, g_channel, b_channel = cv2.split(img_background)
-            alpha_channel = np.ones(b_channel.shape, dtype=b_channel.dtype) * 255 #creating a dummy alpha channel image.
-            img_background_RGBA = cv2.merge((r_channel, g_channel, b_channel, alpha_channel))
-
-            #now paste the img on the background
-            alpha = 1.0
-            beta = 1.0
-            #beta = (1.0 - alpha)
-            top = int( (IMG_WINDOW_Y - img_height) / 2 )
-            bottom = int( (IMG_WINDOW_Y - img_height) / 2 )
-            left = int( (IMG_WINDOW_X - img_width) / 2 )
-            right = int( (IMG_WINDOW_X - img_width) / 2 )
-            borderType = cv2.BORDER_CONSTANT
-
-            # (!) error in code sometime i get negative borders!
-            flag_error = False
-            if ((left < 0) or (right<0) or (top<0) or (bottom<0)):
-                flag_error = True
-
-            if (flag_error == False):
-                value = [0, 0, 0, 0]
-                target = cv2.copyMakeBorder(img_clipped_RGBA, top, bottom, left, right, borderType, None, value)
-                target = stretch_to_fit_box(target, IMG_WINDOW_X, IMG_WINDOW_Y)
-                target = stamp_image(target, img_background_RGBA)
-                blurred_transition = np.copy(target)
-
-                #now blur the edges of the photo for nice transition to background
-                for i in range(0,2):                
-                    blurred_transition = cv2.GaussianBlur(blurred_transition,(5,5),cv2.BORDER_DEFAULT)
-            
-                #mask out the middle
-                EDGE_MIX = 1.4
-                #erase                
-                cv2.rectangle(blurred_transition,(int(left * EDGE_MIX), int(top * EDGE_MIX)), (int(IMG_WINDOW_X - right * EDGE_MIX), int(IMG_WINDOW_Y - bottom * EDGE_MIX)), (0, 0, 0, 255), -1)
-                #make transparent
-                cv2.rectangle(blurred_transition,(int(left * EDGE_MIX), int(top * EDGE_MIX)), (int(IMG_WINDOW_X - right * EDGE_MIX), int(IMG_WINDOW_Y - bottom * EDGE_MIX)), (0, 0, 0, 0), -1)
-
-                #add the images
-                target_with_blurry_edge = stamp_image(blurred_transition, target)
-
-            #resize just incase due to rounding errors
-            target_with_blurry_edge = stretch_to_fit_box(target_with_blurry_edge, IMG_WINDOW_X, IMG_WINDOW_Y)
-           
-            # first image is on top            
-            target2 = stamp_image(target_with_blurry_edge, img_background_RGBA)
-            clipped_images.append({ row['LabelName']: target2 })
-          #  file_handler.save_image("boutput.png", "", target2, True)           
-          #  file_handler.save_image("bedge.png", "", target_with_blurry_edge, True)     
-          #  file_handler.save_image("bbackbround.png", "", img_background_RGBA, True)          
-
+def create_list_of_false_clips(max_try, number_of_clips, my_img, target_rows, window_x, window_y):
+    index, height, width, color = my_img.shape   
     # create false targets
-    MAX_TRY = len(clipped_images) * 3
     success = 0
-    for i in range(0, 100): # randomly select 100 clips to try and get MAX_TRY images
-        if (success >= MAX_TRY):
+    list_of_boxes = []
+    for i in range(0, max_try): # randomly select 100 clips to try and get MAX_TRY images
+        if (success >= number_of_clips):
             break
 
-        #select a clip that is not in target
-        y_min = int (random.randint(0, height-IMG_WINDOW_Y))
-        x_min = int (random.randint(0, width-IMG_WINDOW_X))
+        #make sure the it is valid range
+        if ( (height-window_y) <= 2 ):
+            return list_of_boxes
 
-        y_max = IMG_WINDOW_Y + y_min
-        x_max = IMG_WINDOW_X + x_min
+        if ( (width-window_x) <= 2 ):
+            return list_of_boxes
+
+        #select a clip that is not in target
+        y_min = int (random.randint(0, height-window_y))
+        x_min = int (random.randint(0, width-window_x))
+
+        y_max = random.gauss(window_y, window_y / 6.0) + y_min
+        x_max = random.gauss(window_x, window_x / 3.0) + x_min
 
         #exception handling, should not happen
         if (y_max > height): 
@@ -137,18 +55,139 @@ def create_clipped_images(img_id, filepath, target_rows, IMG_WINDOW_X, IMG_WINDO
         if (flag_inside):
             continue
 
-        #clip this image because it is not in the target box
-        img_clipped = my_img[0, y_min : y_max, 
-                                x_min : x_max, :]
-
-
+        #clip this image because it is not in the target box        
         success = success + 1
-    #    clipped_images.append({ 'non-target' : img_clipped })
+        list_of_boxes.append((int(x_min), int(y_min), int(x_max), int(y_max)))        
           
+    return list_of_boxes
+
+def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):        
+    # copy the bounding box to new image
+    
+    # load the image
+    my_img = file_handler.load_image(filepath + img_id + ".jpg")
+    index, height, width, color = my_img.shape   
+    if (DEBUG_MODE):
+        print("Image height: " + str(height))
+        print("Image width: "+  str(width))
+
+    # first add the target images
+    clipped_images = [] #list    
+    for index, row in target_rows.iterrows():  
+        img_clipped = my_img[0, int(height * row['YMin']) : int(height * row['YMax']), 
+                                int(width * row['XMin']) : int(width * row['XMax']), :]
+
+        result, target_img = process_image_for_window(img_clipped, window_x, window_y)
+        if (result == True):
+            clipped_images.append({ row['LabelName']: target_img })
+            #  file_handler.save_image("boutput.png", "", target2, True)           
+    
+    # second add the false targets
+    list_of_boxes = create_list_of_false_clips(100, 3, my_img, target_rows, window_x, window_y)
+
+    for box in list_of_boxes:
+        img_clipped = my_img[0, box[1] : box[3], 
+                               box[0] : box[2], :]
+
+        result, target_img = process_image_for_window(img_clipped, window_x, window_y)
+        if (result == True):
+            clipped_images.append({ 'non-target': target_img })
 
     return clipped_images
 
-def stamp_image(img_fg, img_bg):
+
+def create_blurred_background(my_img,window_x, window_y):
+    return 0
+
+def add_alpha(my_img):
+    # add alpha channel to both images
+    r_channel, g_channel, b_channel = cv2.split(my_img)
+    alpha_channel = np.ones(b_channel.shape, dtype=b_channel.dtype) * 255 #creating a dummy alpha channel image.
+    return cv2.merge((r_channel, g_channel, b_channel, alpha_channel))
+
+def add_border(my_img, window_x, window_y):
+    img_height, img_width, img__color = my_img.shape
+
+    top = int( (window_y - img_height) / 2 )
+    bottom = int( (window_y - img_height) / 2 )
+    left = int( (window_x - img_width) / 2 )
+    right = int( (window_x - img_width) / 2 )
+
+    # (!) error in code sometime i get negative borders!
+    flag_error = False
+    if ((left < 0) or (right<0) or (top<0) or (bottom<0)):
+        return False, my_img  # (!) something wrong
+    # -------------- fix later ----------------------------
+
+    value = [0, 0, 0, 0] # transparent border
+   
+    return True, cv2.copyMakeBorder(my_img, top, bottom, left, right, cv2.BORDER_CONSTANT, None, value)
+
+def process_image_for_window(my_img, window_x, window_y):    
+    img_clipped = zoom_to_fit_box(window_x, window_y, my_img)
+    img_background = np.copy(img_clipped)
+
+    img_height, img_width, img__color = img_clipped.shape
+
+    # validate dimensions
+    if ((img_width == 0) or (img_height ==0)):
+        return False, my_img
+            
+    if ((img_height*.75) < img_width): # if the image not meets aspect ratio requirements then        
+        return False, my_img
+
+        # add alpha channel to both images
+    img_clipped_RGBA = add_alpha(img_clipped)
+    img_background_RGBA = add_alpha(img_background)
+
+    # Process the background image ----------------
+    # stretch it to fit the window
+    img_background_RGBA = stretch_to_fit_box(img_background_RGBA, window_x, window_y)        
+    #blurr it severely        
+    for i in range(0,10):   
+        img_background_RGBA = cv2.GaussianBlur(img_background_RGBA,(BLUR_SIZE,BLUR_SIZE),cv2.BORDER_DEFAULT)
+    # -----------------------------------------------
+    
+    # define the border on the foreground image       
+    result, target = add_border(img_clipped_RGBA, window_x, window_y)
+    if (result == False):
+        #error occured -- need to fix
+        return False, my_img
+    target = stretch_to_fit_box(target, window_x, window_y)
+    target = stamp_image(target, img_background_RGBA, window_x, window_y)
+    blurred_transition = np.copy(target)
+
+    #now blur the edges of the photo for nice transition to background
+    for i in range(0,2):                
+        blurred_transition = cv2.GaussianBlur(blurred_transition,(5,5),cv2.BORDER_DEFAULT)
+
+    #del out the middle
+    EDGE_MIX = 1.4
+    top = int( (window_y - img_height) / 2 )
+    bottom = int( (window_y - img_height) / 2 )
+    left = int( (window_x - img_width) / 2 )
+    right = int( (window_x - img_width) / 2 )
+    #erase                
+    cv2.rectangle(blurred_transition,(int(left * EDGE_MIX), int(top * EDGE_MIX)), (int(window_x - right * EDGE_MIX), int(window_y - bottom * EDGE_MIX)), (0, 0, 0, 255), -1)
+    #make transparent
+    cv2.rectangle(blurred_transition,(int(left * EDGE_MIX), int(top * EDGE_MIX)), (int(window_x - right * EDGE_MIX), int(window_y - bottom * EDGE_MIX)), (0, 0, 0, 0), -1)
+
+    #add the images
+    target_with_blurry_edge = stamp_image(blurred_transition, target, window_x, window_y)
+
+    #resize just incase due to rounding errors
+    target_with_blurry_edge = stretch_to_fit_box(target_with_blurry_edge, window_x, window_y)
+    
+    # first image is on top            
+    target2 = stamp_image(target_with_blurry_edge, img_background_RGBA, window_x, window_y)
+
+    return True, target2
+
+def stamp_image(img_fg, img_bg, window_x, window_y):
+    #stretch images to meet window size
+    img_fg = stretch_to_fit_box(img_fg, window_x, window_y)
+    img_bg = stretch_to_fit_box(img_bg, window_x, window_y)
+
     # Now create a mask of foreground
     img2gray = cv2.cvtColor(img_fg.astype('uint8'), cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
@@ -175,9 +214,8 @@ def stretch_to_fit_box(my_image, box_width, box_height):
 def zoom_to_fit_box(box_width, box_height, my_image):    
     img_height, img_width, img_color = my_image.shape
 
-    if ((img_width == 0) or (img_height ==0)):
+    if ((img_width <= 1) or (img_height <= 1)):
         return my_image
-    
 
     #too big 
     flag_too_big_horizontal = (img_width > box_width)
@@ -231,8 +269,28 @@ def cut_out_target(target_label, selected_rows):
         else:
             my_rows.append(human_row)
 
-    print("\n")
-    print(my_rows.head())
+    if (DEBUG_MODE):
+        print("\n")
+        print(my_rows.head())
 
     return my_rows
+
+def get_y_value(img_array, y_values_dict, true_positive_labels):
+    
+    number_rows = img_array.shape[0]
+    y_values = np.empty((number_rows,))        
+    
+    i = 0
+    for img_name in img_array:
+        y_value = y_values_dict[img_name]
+
+        if y_value in true_positive_labels:
+            y_values[i] = 1.0
+        else:
+            y_values[i] = 0.0
+        
+        i = i + 1
+
+
+    return y_values
 
