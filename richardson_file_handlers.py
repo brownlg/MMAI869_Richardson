@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
+import cv2
+import scipy as scipy
 
 import os
 import glob
@@ -10,11 +12,16 @@ from keras.preprocessing.image import save_img
 
 
 #load image
-def load_image(datafile, path = ""):
+def load_image(datafile, path = "", flag_bw_load = False):    
     file_path = os.path.join(path, datafile)
+    
     #print("loading file " + file_path)
 
-    img = load_img(file_path)  # this is a PIL image
+    if (flag_bw_load):        
+        img = load_img(file_path, True)  # this is a PIL image
+    else:
+        img = load_img(file_path)  # this is a PIL image
+
     x = img_to_array(img)  # this is a Numpy array with shape (3, 150, 150)
     x = x.reshape((1,) + x.shape)  # this is a Numpy array with shape (1, 3, 150, 150)
 
@@ -23,9 +30,16 @@ def load_image(datafile, path = ""):
     return x
 
 #save image
-def save_image(filename, path = "", image_data = None, flag_png = False):
+def save_image(filename, path = "", image_data = None, flag_png = False, remove_color = False):
     if (flag_png == False):
-        save_img(os.path.join(path, filename), image_data)
+        if (remove_color):
+            image_data = cv2.cvtColor(image_data, cv2.COLOR_RGBA2GRAY)
+
+        myfile = filename.split('.')[0]
+        myfile = myfile + ".jpg"   
+        #save_img(os.path.join(path, myfile), image_data)
+        cv2.imwrite(os.path.join(path, myfile), image_data)
+
     else:
         myfile = filename.split('.')[0]
         myfile = myfile + ".png"        
@@ -48,26 +62,26 @@ def get_file_list(path = "", ext = "jpg"):
 
     return file_list
 
-def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000):
+def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, window_x=10, window_y=10, num_channels = 1):
     file_list = []
     
     for root, dirs, files in os.walk(file_path):
         file_list = file_list + files
 
+    number_of_files = len(file_list) 
+
+    #create numpy array for files
+    filenames = np.empty((number_of_files,), dtype = object)
+    img_arr = np.empty((number_of_files, window_y, window_x, num_channels), dtype = object)
+
     cc=0
-    flag_first = True    
     for file_name in file_list:
         # open the file add to array
-        img = load_image(file_name, file_path)  # this is a PIL image
+        img = load_image(file_name, file_path, True)  # this is a PIL image
         
-        if (flag_first):
-            img_arr = img
-            filenames = np.array([file_name])
-            flag_first = False
-        else:            
-            img_arr = np.append(img_arr, img, axis=0)
-            filenames = np.append(filenames, [file_name], axis=0)
-        
+        img_arr[cc] = img
+        filenames[cc] = file_name
+    
         cc = cc + 1
         if (cc >= max_limit):
             break

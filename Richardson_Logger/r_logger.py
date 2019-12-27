@@ -9,6 +9,7 @@ class R_logger:
 
     def clear(self):
         self.f = open(self.filename, 'w')
+        self.f.close()
   
     def open(self):
         self.f = open(self.filename, 'r')

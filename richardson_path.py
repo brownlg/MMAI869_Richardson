@@ -16,3 +16,7 @@ human_labels = {
 		"/m/04yx4" : "Man",
 		"/m/03bt1vf": "Woman"
 	}
+
+#dimensions of input image
+WINDOW_X = 20
+WINDOW_Y = 60

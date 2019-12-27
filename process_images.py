@@ -14,12 +14,12 @@ import Richardson_Logger
 
 import richardson_path
 
-TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.7, 0.2, 0.1)
+TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 
 IMG_WINDOW_X = 20
 IMG_WINDOW_Y = 60
 
-COLLECT_MAX = 10000000 #select how many images you want total
+COLLECT_MAX = 2000000 #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 
@@ -89,11 +89,12 @@ for img_id in img_list:
 		else:
 			identify_non_target = ""
 		
-		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.png'
+		
+		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.jpg'
 		
 		# store data
 		#print(img_clipped.shape)
-		save_image(clipfilename, flag_data_for, img_clipped, True) # needs to be png
+		save_image(clipfilename, flag_data_for, img_clipped, False, True)  # needs to be png? or B&W 
 
 		my_logger.write_line(flag_data_for + "," + key + "," + clipfilename + "\n")	
 		

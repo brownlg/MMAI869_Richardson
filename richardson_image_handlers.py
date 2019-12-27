@@ -9,6 +9,60 @@ BLUR_SIZE = 21
 
 DEBUG_MODE = False
 
+# for object detection, return an array of images
+def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
+    img_height, img_width, img_color = my_image.shape
+    print (my_image.shape)
+
+    #create image array
+    number_of_clips = 1
+    img_arr = np.empty((number_of_clips, window_y, window_x, num_channels), dtype=int)
+
+    list_of_boxes = []
+
+    cc = 0
+
+    #create list of boxes check
+    x_min = 0
+    y_min = 0
+    x_max = x_min + window_x
+    y_max = y_min + window_y
+    step_x = 20
+    step_y = 60
+    steps_x =  int((img_width - window_x) /step_x)
+    steps_y = int((img_height - window_y) / step_y)
+
+    #create image array
+    number_of_clips = steps_x * steps_y
+    img_arr = np.empty((number_of_clips, window_y, window_x, num_channels), dtype=int)
+
+    for y in range(0, steps_y):
+        for x in range(0, steps_x):      
+            list_of_boxes.append((int(x_min), int(y_min), int(x_max), int(y_max)))        
+            x_min = x_min + step_x       
+            x_max = x_min + window_x
+        
+        x_min = 0
+        x_max = x_min + window_x       
+        y_min = y_min + step_y
+        y_max = y_min + window_y
+   
+    for box in list_of_boxes:
+        img_clipped = my_image[box[1] : box[3], 
+                               box[0] : box[2], :]
+
+        clip_height, clip_width, img_color = img_clipped.shape
+
+        #zoom to fit box
+        zoom_x = float(window_x) / float(clip_width)
+        zoom_y = float(window_y) / float(clip_height)                
+      #  img_clipped = cv2.resize(img_clipped, dsize=(int(zoom_x * img_width), int(zoom_y * img_height)), interpolation= cv.INTER_CUBIC)
+
+        #save image for processing
+        img_arr[cc] = img_clipped
+        cc = cc + 1
+       
+    return img_arr, list_of_boxes
 
 def create_list_of_false_clips(max_try, number_of_clips, my_img, target_rows, window_x, window_y):
     index, height, width, color = my_img.shape   
@@ -83,7 +137,7 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
             #  file_handler.save_image("boutput.png", "", target2, True)           
     
     # second add the false targets
-    list_of_boxes = create_list_of_false_clips(100, 3, my_img, target_rows, window_x, window_y)
+    list_of_boxes = create_list_of_false_clips(100, 50, my_img, target_rows, window_x, window_y)
 
     for box in list_of_boxes:
         img_clipped = my_img[0, box[1] : box[3], 
@@ -282,7 +336,11 @@ def get_y_value(img_array, y_values_dict, true_positive_labels):
     
     i = 0
     for img_name in img_array:
-        y_value = y_values_dict[img_name]
+        if img_name not in y_values_dict:
+            print("missing y value " + img_name + " set to false")
+            y_value = 'non-target'
+        else:
+            y_value = y_values_dict[img_name]
 
         if y_value in true_positive_labels:
             y_values[i] = 1.0
@@ -290,7 +348,5 @@ def get_y_value(img_array, y_values_dict, true_positive_labels):
             y_values[i] = 0.0
         
         i = i + 1
-
-
     return y_values
 
