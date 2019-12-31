@@ -7,6 +7,10 @@ from bbox.metrics import jaccard_index_2d, BBox2D
 
 BLUR_SIZE = 21
 
+
+print(cv2.__version__)
+
+
 DEBUG_MODE = False
 
 # for object detection, return an array of images
@@ -31,6 +35,13 @@ def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
     step_y = 60
     steps_x =  int((img_width - window_x) /step_x)
     steps_y = int((img_height - window_y) / step_y)
+
+    if (steps_x == 0) and (steps_y == 0):
+        img_clipped = my_image[y_min : y_max, 
+                               x_min : x_max, :]
+        img_arr[0] = img_clipped
+        list_of_boxes.append((int(x_min), int(y_min), int(x_max), int(y_max)))     
+        return img_arr, list_of_boxes
 
     #create image array
     number_of_clips = steps_x * steps_y
@@ -120,6 +131,10 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
     
     # load the image
     my_img = file_handler.load_image(filepath + img_id + ".jpg")
+
+    if (my_img is None):
+        return None
+
     index, height, width, color = my_img.shape   
     if (DEBUG_MODE):
         print("Image height: " + str(height))
@@ -141,9 +156,10 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
 
     for box in list_of_boxes:
         img_clipped = my_img[0, box[1] : box[3], 
-                               box[0] : box[2], :]
+                                box[0] : box[2], :]
 
         result, target_img = process_image_for_window(img_clipped, window_x, window_y)
+
         if (result == True):
             clipped_images.append({ 'non-target': target_img })
 
@@ -329,15 +345,16 @@ def cut_out_target(target_label, selected_rows):
 
     return my_rows
 
-def get_y_value(img_array, y_values_dict, true_positive_labels):
+def get_y_value(file_list, y_values_dict, true_positive_labels):
     
-    number_rows = img_array.shape[0]
+    number_rows = len(file_list)
     y_values = np.empty((number_rows,))        
     
     i = 0
-    for img_name in img_array:
+    for img_name in file_list:
         if img_name not in y_values_dict:
-            print("missing y value " + img_name + " set to false")
+            print("missing y value set to false")
+            print(img_name)
             y_value = 'non-target'
         else:
             y_value = y_values_dict[img_name]

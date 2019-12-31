@@ -18,15 +18,22 @@ def load_image(datafile, path = "", flag_bw_load = False):
     #print("loading file " + file_path)
 
     if (flag_bw_load):        
-        img = load_img(file_path, True)  # this is a PIL image
+        try:
+            img = load_img(file_path, True)  # this is a PIL image
+        except:
+            print("error trying to load")
+            return None
     else:
-        img = load_img(file_path)  # this is a PIL image
+        try:
+            img = load_img(file_path)  # this is a PIL image
+        except:
+            print("error trying to load")
+            return None
 
     x = img_to_array(img)  # this is a Numpy array with shape (3, 150, 150)
     x = x.reshape((1,) + x.shape)  # this is a Numpy array with shape (1, 3, 150, 150)
 
     #print("image shape returned " + str(x.shape))
-
     return x
 
 #save image
@@ -70,6 +77,19 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
 
     number_of_files = len(file_list) 
 
+    # using naive method  
+    # to remove None values in list 
+    res = [] 
+    for val in file_list: 
+        if val is not None : 
+            res.append(val) 
+
+    file_list = res
+
+    number_of_files = len(file_list) 
+
+    number_of_files = min(number_of_files, max_limit)
+
     #create numpy array for files
     filenames = np.empty((number_of_files,), dtype = object)
     img_arr = np.empty((number_of_files, window_y, window_x, num_channels), dtype = object)
@@ -78,13 +98,12 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
     for file_name in file_list:
         # open the file add to array
         img = load_image(file_name, file_path, True)  # this is a PIL image
-        
-        img_arr[cc] = img
-        filenames[cc] = file_name
-    
+      
+        img_arr[cc] = img[0]
+
         cc = cc + 1
         if (cc >= max_limit):
             break
 
-    return img_arr, filenames
+    return img_arr, file_list
 

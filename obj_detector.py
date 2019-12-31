@@ -4,16 +4,20 @@ import cv2
 import os
 
 #dimensions of input image
-WINDOW_X = 20
-WINDOW_Y = 60
+WINDOW_X = 40
+WINDOW_Y = 40
 
 # load the trained neural network
 from keras.models import load_model
 my_model = load_model("my_classifier_soft_max_2.h5")
 
 # open the image scene
-file_to_scan = "0000ec18c34241ad.jpg"
+#file_to_scan = "0000ec18c34241ad.jpg"
 #file_to_scan = "00a06e610f2d6fc2.jpg"
+#file_to_scan = "00cdf56c63191fd3.jpg"  # beach 
+#file_to_scan = "0a1aee5d7701ce5c_1.jpg"  # 
+file_to_scan = "0a1aee5d7701ce5c_2F.jpg"  # 
+
 my_image = file_handler.load_image(file_to_scan, "",True)[0]
 
 #reate grid z-level 0
@@ -35,7 +39,7 @@ for result in results:
                                 (box[2], box[3]), (255, 255, 255), 2)
     cc = cc + 1
 
-cv2.imwrite(os.path.join("", "obj_detected.jpg"), my_image)
+cv2.imwrite(os.path.join("", "obj_detected2.jpg"), my_image)
 
 
 

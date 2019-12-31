@@ -16,10 +16,10 @@ import richardson_path
 
 TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 
-IMG_WINDOW_X = 20
-IMG_WINDOW_Y = 60
+IMG_WINDOW_X = 40
+IMG_WINDOW_Y = 40
 
-COLLECT_MAX = 2000000 #select how many images you want total
+COLLECT_MAX = 100000000 #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 
@@ -37,7 +37,8 @@ for label_name in richardson_path.human_labels:
 	
 	#create a list
 	for row in rows_human.ImageID:
-		img_list.append(row)
+		if row not in img_list:  # make sure you only have unique entries!
+			img_list.append(row)
 
 
 # select rows with ImageID
@@ -66,6 +67,9 @@ for img_id in img_list:
 	#print(target_rows)
 	clipped_images = richardson_image_handlers.create_clipped_images(img_id, richardson_path.DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
 
+	if (clipped_images == None):
+		continue
+
 	clip_index = 0
 	r = random()
 	# split data into train, test, validation
@@ -88,8 +92,7 @@ for img_id in img_list:
 			identify_non_target = "F"
 		else:
 			identify_non_target = ""
-		
-		
+				
 		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.jpg'
 		
 		# store data
