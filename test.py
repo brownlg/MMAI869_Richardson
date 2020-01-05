@@ -7,3 +7,6 @@ my_logger.write_line("data,12,324,22\n")
 my_logger.write_line("data\n")
 my_logger.write_line("data\n")
 my_logger.write_line("data\n")
+
+
+print('Diana')
