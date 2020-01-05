@@ -31,8 +31,8 @@ def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
     y_min = 0
     x_max = x_min + window_x
     y_max = y_min + window_y
-    step_x = 20
-    step_y = 60
+    step_x = 3
+    step_y = 3
     steps_x =  int((img_width - window_x) /step_x)
     steps_y = int((img_height - window_y) / step_y)
 
@@ -152,7 +152,7 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
             #  file_handler.save_image("boutput.png", "", target2, True)           
     
     # second add the false targets
-    list_of_boxes = create_list_of_false_clips(100, 50, my_img, target_rows, window_x, window_y)
+    list_of_boxes = create_list_of_false_clips(200, 80, my_img, target_rows, window_x, window_y)
 
     for box in list_of_boxes:
         img_clipped = my_img[0, box[1] : box[3], 
@@ -232,7 +232,7 @@ def process_image_for_window(my_img, window_x, window_y):
         blurred_transition = cv2.GaussianBlur(blurred_transition,(5,5),cv2.BORDER_DEFAULT)
 
     #del out the middle
-    EDGE_MIX = 1.4
+    EDGE_MIX = 1.1
     top = int( (window_y - img_height) / 2 )
     bottom = int( (window_y - img_height) / 2 )
     left = int( (window_x - img_width) / 2 )

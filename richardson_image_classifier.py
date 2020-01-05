@@ -9,14 +9,14 @@ import richardson_image_handlers as image_handler
 from Richardson_Logger import r_logger
 
 #dimensions of input image
-WINDOW_X = 40
-WINDOW_Y = 40
+WINDOW_X = 80
+WINDOW_Y = 80
 
 from keras import backend as K
 #print(K.tensorflow_backend._get_available_gpus())
 import matplotlib.pyplot as plt
 
-max_images = 100000
+max_images = 3500000
 
 print("Loading dictionary for y_train...")
 my_logger = r_logger.R_logger(my_paths.INFO_PATH + '\\' + "data.csv")
@@ -58,10 +58,22 @@ from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 
 # Creating a Sequential Model and adding the layers
 model = Sequential()
-model.add(Conv2D(WINDOW_X * WINDOW_Y, kernel_size=(3,3), input_shape=input_shape))
+#model.add(Conv2D(WINDOW_X * WINDOW_Y, kernel_size=(3,3), activation='relu', padding = 'same' input_shape=input_shape))
+
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(128, kernel_size=(5, 5), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(4, 4)))
+
+model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(4, 4)))
+
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+
 model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
-#model.add(Dense(128, activation=tf.nn.relu))
 model.add(Dense(128, activation=tf.nn.relu))
 model.add(Dropout(0.2))
 
@@ -70,16 +82,16 @@ model.add(Dropout(0.2))
 #model.add(Dense(2,activation=tf.nn.tanh))
 model.add(Dense(2, activation='softmax'))  
 
-#model.compile(optimizer='adam', 
-#              loss='sparse_categorical_crossentropy', 
-#              metrics=['accuracy'])
-
 model.compile(optimizer='adam', 
               loss='sparse_categorical_crossentropy', 
-              metrics=['mse'])
+              metrics=['accuracy'])
+
+#model.compile(optimizer='adam', 
+#              loss='sparse_categorical_crossentropy', 
+#              metrics=['mse'])
 
 
-model.fit(x=x_train, y=y_train, batch_size = 32, epochs=3)
+model.fit(x=x_train, y=y_train, batch_size = 400, epochs = 5)
 
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
