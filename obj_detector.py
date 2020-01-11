@@ -13,13 +13,15 @@ from keras.models import load_model
 #my_model = load_model("my_classifier_soft_max_2.h5") 
 my_model = load_model("my_classifier_soft_max_2.h5") 
 
+my_model.summary()
+
 # open the image scene
 #file_to_scan = "0000ec18c34241ad.jpg"
 #file_to_scan = "00a06e610f2d6fc2.jpg"
 #file_to_scan = "00cdf56c63191fd3.jpg"  # beach 
 #file_to_scan = "0a1aee5d7701ce5c_1.jpg"  # 
 #file_to_scan = "0a1aee5d7701ce5c_2F.jpg"  #
-file_to_scan = "TTC_example2.jpg"
+file_to_scan = "TTC_example2-test.jpg"
 
 my_image = file_handler.load_image(file_to_scan, "",True)[0]
 
@@ -35,7 +37,7 @@ print("done")
 # draw the boxes on the image
 cc=0
 for result in results:    
-    if (result[0] < 0.5):
+    if (result[1] > 0.99999):
         #person found, draw the box
         box = list_of_boxes[cc]
         #draw rectangle
