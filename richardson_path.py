@@ -9,6 +9,8 @@ VALIDATION_PATH = 'richardson_images_validation_set'
 INFO_PATH = 'richardson_info_files'
 
 
+DEBUG_MODE = False
+
 # get the human labels
 human_labels = {
 #		"/m/02p0tk3" : "Human body"

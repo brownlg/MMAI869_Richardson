@@ -11,7 +11,7 @@ BLUR_SIZE = 21
 print(cv2.__version__)
 
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 # for object detection, return an array of images
 def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
@@ -95,13 +95,18 @@ def create_list_of_false_clips(max_try, number_of_clips, my_img, target_rows, wi
         y_min = int (random.randint(0, height-window_y))
         x_min = int (random.randint(0, width-window_x))
 
-        y_max = random.gauss(window_y, window_y / 6.0) + y_min
-        x_max = random.gauss(window_x, window_x / 3.0) + x_min
+        # not needed anymore: 
+        # y_max = random.gauss(window_y, window_y / 6.0) + y_min
+        # x_max = random.gauss(window_x, window_x / 3.0) + x_min
+        y_max = window_y + y_min
+        x_max = window_x + x_min
 
         #exception handling, should not happen
         if (y_max > height): 
+            print("lb error - ymax exceed height")
             continue
         if (x_max > width):
+            print('lb error - xmax exceed width')
             continue
 
         #does this clip fall inside target clips?
@@ -126,6 +131,22 @@ def create_list_of_false_clips(max_try, number_of_clips, my_img, target_rows, wi
           
     return list_of_boxes
 
+
+def get_padding(window_x, window_y, my_clip_width, my_clip_height):
+    # calculate the zoom factor, you maintain aspect ratio so should be same
+    zoom_x, zoom_y = get_zooms(my_clip_width, my_clip_height, window_x, window_y)
+
+    # calculate which pixels you need to pad in the zoom out view
+    window_fill_pic_x = my_clip_width * zoom_x
+    window_fill_pic_y = my_clip_height * zoom_y
+
+    padding_x = window_x - window_fill_pic_x
+    padding_y = window_y - window_fill_pic_y
+
+    padding_x = int(padding_x / 2)
+    padding_y = int (padding_y / 2)    
+    return padding_x, padding_y
+
 def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):        
     # copy the bounding box to new image
     
@@ -143,8 +164,28 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
     # first add the target images
     clipped_images = [] #list    
     for index, row in target_rows.iterrows():  
-        img_clipped = my_img[0, int(height * row['YMin']) : int(height * row['YMax']), 
-                                int(width * row['XMin']) : int(width * row['XMax']), :]
+        # calculate the bounds with the window size
+        my_clip_width = int(width * row['XMax']) - int(width * row['XMin']) 
+        my_clip_height = int(height * row['YMax']) - int(height * row['YMin'])
+
+        # calculate which pixels you need to pad in the zoom out view
+        padding_x, padding_y = get_padding(window_x, window_y, my_clip_width, my_clip_height)
+
+        #make sure you with padding you are still on image
+        pixel_start_x = int(width * row['XMin']) - padding_x
+        pixel_end_x =  int(width * row['XMax']) + padding_x
+
+        pixel_start_y = int(height * row['YMin']) - padding_y 
+        pixel_end_y = int(height * row['YMax']) + padding_y
+
+        max(pixel_start_x, 0)
+        min(pixel_end_x, width)
+
+        max(pixel_start_y, 0)
+        min(pixel_end_y, height)
+
+        img_clipped = my_img[0, pixel_start_y : pixel_end_y, 
+                                pixel_start_x: pixel_end_x, :]
 
         result, target_img = process_image_for_window(img_clipped, window_x, window_y)
         if (result == True):
@@ -152,11 +193,31 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
             #  file_handler.save_image("boutput.png", "", target2, True)           
     
     # second add the false targets
-    list_of_boxes = create_list_of_false_clips(200, 10, my_img, target_rows, window_x, window_y)
+    list_of_boxes = create_list_of_false_clips(200, 3, my_img, target_rows, window_x, window_y)
 
     for box in list_of_boxes:
-        img_clipped = my_img[0, box[1] : box[3], 
-                                box[0] : box[2], :]
+        # calculate the bounds with the window size
+        my_clip_width = box[2] - box[0] 
+        my_clip_height = box[3] - box[1]
+
+        # calculate which pixels you need to pad in the zoom out view
+        padding_x, padding_y = get_padding(window_x, window_y, my_clip_width, my_clip_height)
+
+        #make sure you with padding you are still on image
+        pixel_start_x = box[0] - padding_x
+        pixel_end_x = box[2] + padding_x
+
+        pixel_start_y = box[1] - padding_y 
+        pixel_end_y = box[3] + padding_y
+
+        max(pixel_start_x, 0)
+        min(pixel_end_x, width)
+
+        max(pixel_start_y, 0)
+        min(pixel_end_y, height)
+
+        img_clipped = my_img[0, pixel_start_y : pixel_end_y, 
+                                pixel_start_x: pixel_end_x, :]
 
         result, target_img = process_image_for_window(img_clipped, window_x, window_y)
 
@@ -195,6 +256,19 @@ def add_border(my_img, window_x, window_y):
 
 def process_image_for_window(my_img, window_x, window_y):    
     img_clipped = zoom_to_fit_box(window_x, window_y, my_img)
+    img_height, img_width, img_color = img_clipped.shape
+
+    # validate dimensions
+    if ((img_width == 0) or (img_height ==0)):
+        return False, my_img
+            
+ #   if ((img_height*.75) < img_width): # if the image not meets aspect ratio requirements then        
+ #       return False, my_img
+
+    return True, img_clipped
+
+def process_image_for_window_old(my_img, window_x, window_y):    
+    img_clipped = zoom_to_fit_box(window_x, window_y, my_img)
     img_background = np.copy(img_clipped)
 
     img_height, img_width, img_color = img_clipped.shape
@@ -206,7 +280,7 @@ def process_image_for_window(my_img, window_x, window_y):
     if ((img_height*.75) < img_width): # if the image not meets aspect ratio requirements then        
         return False, my_img
 
-        # add alpha channel to both images
+     # add alpha channel to both images
     img_clipped_RGBA = add_alpha(img_clipped)
     img_background_RGBA = add_alpha(img_background)
 
@@ -281,8 +355,52 @@ def stretch_to_fit_box(my_image, box_width, box_height):
     
     return cv2.resize(my_image, dsize=(int(zoom_x * img_width), int(zoom_y * img_height)), interpolation=cv2.INTER_CUBIC)
 
+def get_zooms(img_width, img_height, box_width, box_height):
+    if ((img_width <= 1) or (img_height <= 1)):
+        return 1, 1
+
+    #too big 
+    flag_too_big_horizontal = (img_width > box_width)
+    flag_too_big_vertical = (img_height > box_height)
+   
+    if (flag_too_big_horizontal or flag_too_big_vertical):
+        zoom_x = float(box_width) / float(img_width)
+        zoom_y = float(box_height) / float(img_height)
+       
+        #scale by smaller zoom factor - done
+        zoom = min(zoom_x, zoom_y)
+       
+        return zoom, zoom
+
+    flag_too_small_horizontal = (img_width <= box_width)
+    flag_too_small_vertical = (img_height <= box_height)
+
+    #too small in both X & Y ?
+    if (flag_too_small_horizontal and flag_too_small_vertical):
+        #calculate zoom up X & Y
+        zoom_x = float(box_width) / float(img_width)
+        zoom_y = float(box_height) / float(img_height)
+        
+        #calculate window zoom up with X
+        new_width = int(zoom_x * img_width)
+        
+        #calcaulte window zoom up with Y
+        new_height = int(zoom_y * img_height)
+
+        #decide which window fits
+        if (new_width > img_width):
+            zoom = zoom_y
+        else:
+            zoom = zoom_x
+
+        return zoom, zoom
+
+
+    #no change to image required
+    return 1, 1
+
 def zoom_to_fit_box(box_width, box_height, my_image):    
-    img_height, img_width = my_image.shape
+    img_height, img_width, color = my_image.shape
 
     if ((img_width <= 1) or (img_height <= 1)):
         return my_image
