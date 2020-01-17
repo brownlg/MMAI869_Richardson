@@ -44,7 +44,7 @@ x_train, x_train_files = file_handler.load_images_for_keras(my_paths.TRAIN_PATH,
 x_train = x_train / 255
 
 print("Loading images for test...")
-x_test, x_test_files = file_handler.load_im ages_for_keras(my_paths.VALIDATION_PATH, "png",max_images, WINDOW_X, WINDOW_Y)
+x_test, x_test_files = file_handler.load_images_for_keras(my_paths.VALIDATION_PATH, "png",max_images, WINDOW_X, WINDOW_Y)
 x_test = x_test / 255
 
 print('x_train shape:', x_train.shape)

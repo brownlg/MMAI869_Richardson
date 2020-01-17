@@ -282,7 +282,7 @@ def stretch_to_fit_box(my_image, box_width, box_height):
     return cv2.resize(my_image, dsize=(int(zoom_x * img_width), int(zoom_y * img_height)), interpolation=cv2.INTER_CUBIC)
 
 def zoom_to_fit_box(box_width, box_height, my_image):    
-    img_height, img_width = my_image.shape
+    img_height, img_width, color = my_image.shape
 
     if ((img_width <= 1) or (img_height <= 1)):
         return my_image
