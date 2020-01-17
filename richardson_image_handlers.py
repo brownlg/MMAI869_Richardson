@@ -7,6 +7,7 @@ from bbox.metrics import jaccard_index_2d, BBox2D
 import richardson_path
 
 BLUR_SIZE = 21
+FALSE_RATIO = 3
 
 
 print(cv2.__version__)
@@ -32,8 +33,8 @@ def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
     y_min = 0
     x_max = x_min + window_x
     y_max = y_min + window_y
-    step_x = 3
-    step_y = 3
+    step_x = 30
+    step_y = 30
     steps_x =  int((img_width - window_x) /step_x)
     steps_y = int((img_height - window_y) / step_y)
 
@@ -144,8 +145,9 @@ def get_padding(window_x, window_y, my_clip_width, my_clip_height):
     padding_x = window_x - window_fill_pic_x
     padding_y = window_y - window_fill_pic_y
 
-    padding_x = int(padding_x / 2)
-    padding_y = int (padding_y / 2)    
+    padding_x = int(padding_x / 2 / zoom_x)
+    padding_y = int(padding_y / 2 / zoom_y)
+
     return padding_x, padding_y
 
 def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):        
@@ -179,22 +181,24 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
         pixel_start_y = int(height * row['YMin']) - padding_y 
         pixel_end_y = int(height * row['YMax']) + padding_y
 
-        max(pixel_start_x, 0)
-        min(pixel_end_x, width)
+        # make sure in bounds
+        pixel_start_x = max(pixel_start_x, 0)
+        pixel_end_x = min(pixel_end_x, width)
 
-        max(pixel_start_y, 0)
-        min(pixel_end_y, height)
-
+        pixel_start_y = max(pixel_start_y, 0)
+        pixel_end_y = min(pixel_end_y, height)
+    
         img_clipped = my_img[0, pixel_start_y : pixel_end_y, 
                                 pixel_start_x: pixel_end_x, :]
 
         result, target_img = process_image_for_window(img_clipped, window_x, window_y)
+
         if (result == True):
             clipped_images.append({ row['LabelName']: target_img })
             #  file_handler.save_image("boutput.png", "", target2, True)           
     
     # second add the false targets
-    list_of_boxes = create_list_of_false_clips(200, 3, my_img, target_rows, window_x, window_y)
+    list_of_boxes = create_list_of_false_clips(200, FALSE_RATIO, my_img, target_rows, window_x, window_y)
 
     for box in list_of_boxes:
         # calculate the bounds with the window size
@@ -265,6 +269,9 @@ def process_image_for_window(my_img, window_x, window_y):
             
  #   if ((img_height*.75) < img_width): # if the image not meets aspect ratio requirements then        
  #       return False, my_img
+
+    # do final resize with minimum distortion because of rounding
+    img_clipped = cv2.resize(img_clipped, dsize=(int(window_x), int(window_y)), interpolation=cv2.INTER_CUBIC)
 
     return True, img_clipped
 

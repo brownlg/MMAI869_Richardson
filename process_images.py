@@ -13,17 +13,31 @@ from richardson_file_handlers import load_data, save_image, get_file_list
 import Richardson_Logger
 
 import richardson_path
-
+import os
 
 TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 
 IMG_WINDOW_X = 80
 IMG_WINDOW_Y = 80
 
-COLLECT_MAX = 10   #select how many images you want total
+COLLECT_MAX = 35000   #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 
+# delete old files
+print("deleting csv file")
+if os.path.exists(os.path.join("richardson_info_files", "data.csv")):
+	os.remove(os.path.join("richardson_info_files", "data.csv"))
+
+print("deleting old sample files 1/3")
+for filename in os.listdir(os.path.join("richardson_images_train_set")):
+	os.remove(os.path.join("richardson_images_train_set", filename))
+print("deleting old sample files 2/3")
+for filename in os.listdir(os.path.join("richardson_images_validation_set")):
+	os.remove(os.path.join("richardson_images_validation_set", filename))
+print("deleting old sample files 3/3")
+for filename in os.listdir(os.path.join("richardson_images_test_set")):
+	os.remove(os.path.join("richardson_images_test_set", filename))
 
 # get list of images to load, based on jpg in file directory
 # get list of images with human labels first
@@ -102,6 +116,10 @@ for img_id in img_list:
 		
 	# track how many images you have
 	total_collection = total_collection + 1
+
+	if total_collection % 1000 == 0:
+		print("processed another 1000 files...")
+
 	if (total_collection > COLLECT_MAX):
 		break
 

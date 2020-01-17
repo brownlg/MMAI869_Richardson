@@ -18,15 +18,15 @@ my_model.summary()
 # open the image scene
 #file_to_scan = "0000ec18c34241ad.jpg"
 #file_to_scan = "00a06e610f2d6fc2.jpg"
-#file_to_scan = "00cdf56c63191fd3.jpg"  # beach 
+file_to_scan = "00cdf56c63191fd3.jpg"  # beach 
 #file_to_scan = "0a1aee5d7701ce5c_1.jpg"  # 
 #file_to_scan = "0a1aee5d7701ce5c_2F.jpg"  #
-file_to_scan = "TTC_example2-test.jpg"
+#file_to_scan = "TTC_example2-test.jpg"
 
-my_image = file_handler.load_image(file_to_scan, "",True)[0]
+my_image = file_handler.load_image(file_to_scan, "", flag_bw_load=False)[0]
 
 #reate grid z-level 0
-img_arr, list_of_boxes = img_handler.get_grid(my_image, 1, WINDOW_X, WINDOW_Y, 1)
+img_arr, list_of_boxes = img_handler.get_grid(my_image, 1, WINDOW_X, WINDOW_Y, 3)
 img_arr = img_arr / 255
 
 results = my_model.predict(img_arr)
@@ -37,7 +37,7 @@ print("done")
 # draw the boxes on the image
 cc=0
 for result in results:    
-    if (result[1] > 0.99999):
+    if (result[1] > 0.5):
         #person found, draw the box
         box = list_of_boxes[cc]
         #draw rectangle
@@ -45,7 +45,8 @@ for result in results:
                                 (box[2], box[3]), (255, 255, 255), 2)
     cc = cc + 1
 
-cv2.imwrite(os.path.join("", "obj_detected2.jpg"), my_image)
+#cv2.imwrite(os.path.join("", "obj_detected2.jpg"), my_image)
+file_handler.save_image('obj_detected2.png', path = "", image_data = my_image, flag_png = True, remove_color = False)
 
 
 

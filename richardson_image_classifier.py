@@ -3,7 +3,7 @@ from sklearn import datasets
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-
+import os
 #get paths for files
 import richardson_path as my_paths
 import richardson_file_handlers as file_handler
@@ -21,16 +21,16 @@ import matplotlib.pyplot as plt
 max_images = 1000000
 
 print("Loading dictionary for y_train...")
-my_logger = r_logger.R_logger(my_paths.INFO_PATH + '\\' + "data.csv")
+my_logger = r_logger.R_logger(os.path.join(my_paths.INFO_PATH, "data.csv"))
 my_y_values = my_logger.load_dictionary()
 
 print("Loading images for train...")
 #(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-x_train, x_train_files = file_handler.load_images_for_keras(my_paths.TRAIN_PATH, "png", max_images, WINDOW_X, WINDOW_Y)
+x_train, x_train_files = file_handler.load_images_for_keras(my_paths.TRAIN_PATH, "png", max_images, WINDOW_X, WINDOW_Y, num_channels=3)
 x_train = x_train / 255
 
 print("Loading images for test...")
-x_test, x_test_files = file_handler.load_images_for_keras(my_paths.VALIDATION_PATH, "png",max_images, WINDOW_X, WINDOW_Y)
+x_test, x_test_files = file_handler.load_images_for_keras(my_paths.VALIDATION_PATH, "png",max_images, WINDOW_X, WINDOW_Y, num_channels=3)
 x_test = x_test / 255
 
 print('x_train shape:', x_train.shape)
@@ -44,7 +44,7 @@ print('Number of images in x_test', x_test.shape[0])
 # Reshaping the array to 4-dims so that it can work with the Keras API
 #x_train = x_train.reshape(x_train.shape[0], WINDOW_X, WINDOW_Y, 1)
 #x_test = x_test.reshape(x_test.shape[0], WINDOW_X, WINDOW_Y, 1)
-input_shape = (WINDOW_Y, WINDOW_X, 1)
+input_shape = (WINDOW_Y, WINDOW_X, 3)
 
 
 print("Get y values...")
