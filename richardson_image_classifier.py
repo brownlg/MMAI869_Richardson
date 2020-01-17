@@ -1,6 +1,8 @@
 # first attempt at an image classifier
 from sklearn import datasets
 import tensorflow as tf
+import numpy as np
+import pandas as pd
 
 #get paths for files
 import richardson_path as my_paths
@@ -16,7 +18,7 @@ from keras import backend as K
 #print(K.tensorflow_backend._get_available_gpus())
 import matplotlib.pyplot as plt
 
-max_images = 3500000
+max_images = 1000000
 
 print("Loading dictionary for y_train...")
 my_logger = r_logger.R_logger(my_paths.INFO_PATH + '\\' + "data.csv")
@@ -28,7 +30,7 @@ x_train, x_train_files = file_handler.load_images_for_keras(my_paths.TRAIN_PATH,
 x_train = x_train / 255
 
 print("Loading images for test...")
-x_test, x_test_files = file_handler.load_images_for_keras(my_paths.VALIDATION_PATH, "png",max_images, WINDOW_X, WINDOW_Y)
+x_test, x_test_files = file_handler.load_im ages_for_keras(my_paths.VALIDATION_PATH, "png",max_images, WINDOW_X, WINDOW_Y)
 x_test = x_test / 255
 
 print('x_train shape:', x_train.shape)
@@ -60,18 +62,11 @@ from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 model = Sequential()
 #model.add(Conv2D(WINDOW_X * WINDOW_Y, kernel_size=(3,3), activation='relu', padding = 'same' input_shape=input_shape))
 
-model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(128, kernel_size=(5, 5), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(4, 4)))
-
 model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(4, 4)))
-
-model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
+model.add(Conv2D(512, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
 model.add(Dense(128, activation=tf.nn.relu))
@@ -84,19 +79,35 @@ model.add(Dense(2, activation='softmax'))
 
 model.compile(optimizer='adam', 
               loss='sparse_categorical_crossentropy', 
-              metrics=['accuracy'])
+              metrics=['accuracy' ])
 
 #model.compile(optimizer='adam', 
 #              loss='sparse_categorical_crossentropy', 
 #              metrics=['mse'])
 
 
-model.fit(x=x_train, y=y_train, batch_size = 400, epochs = 5)
+model.fit(x=x_train, y=y_train, batch_size = 64, epochs = 10)
 
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
 
 model.save('my_classifier_soft_max_2.h5')
+
+results = model.predict(x_test)
+
+np.savetxt("ZZ-my_results.csv", results, delimiter = ',')
+#np.savetxt("ZZ-x_test.csv", x_test, delimiter = ',')
+
+files_txt = r_logger.R_logger("ZZ-x_test_files.csv")
+
+for row in x_test_files:
+    files_txt.write_line(row + '\n')
+
+files_txt.close()
+
+
+#np.savetxt("ZZ-y_test.csv", y_test, delimiter = ',')
+
 
 # my_model = model.load("")
 # my_model.predict()

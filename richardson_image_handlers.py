@@ -152,7 +152,7 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
             #  file_handler.save_image("boutput.png", "", target2, True)           
     
     # second add the false targets
-    list_of_boxes = create_list_of_false_clips(200, 80, my_img, target_rows, window_x, window_y)
+    list_of_boxes = create_list_of_false_clips(200, 10, my_img, target_rows, window_x, window_y)
 
     for box in list_of_boxes:
         img_clipped = my_img[0, box[1] : box[3], 
@@ -197,7 +197,7 @@ def process_image_for_window(my_img, window_x, window_y):
     img_clipped = zoom_to_fit_box(window_x, window_y, my_img)
     img_background = np.copy(img_clipped)
 
-    img_height, img_width, img__color = img_clipped.shape
+    img_height, img_width, img_color = img_clipped.shape
 
     # validate dimensions
     if ((img_width == 0) or (img_height ==0)):
@@ -282,7 +282,7 @@ def stretch_to_fit_box(my_image, box_width, box_height):
     return cv2.resize(my_image, dsize=(int(zoom_x * img_width), int(zoom_y * img_height)), interpolation=cv2.INTER_CUBIC)
 
 def zoom_to_fit_box(box_width, box_height, my_image):    
-    img_height, img_width, img_color = my_image.shape
+    img_height, img_width, color = my_image.shape
 
     if ((img_width <= 1) or (img_height <= 1)):
         return my_image
