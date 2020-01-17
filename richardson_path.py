@@ -8,7 +8,6 @@ TEST_PATH = 'richardson_images_test_set'
 VALIDATION_PATH = 'richardson_images_validation_set'
 INFO_PATH = 'richardson_info_files'
 
-
 DEBUG_MODE = False
 
 # get the human labels

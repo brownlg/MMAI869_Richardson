@@ -4,14 +4,15 @@ import numpy as np
 import cv2
 import random as random
 from bbox.metrics import jaccard_index_2d, BBox2D
+import richardson_path
 
 BLUR_SIZE = 21
 
 
 print(cv2.__version__)
 
+DEBUG_MODE = False
 
-DEBUG_MODE = True
 
 # for object detection, return an array of images
 def get_grid(my_image, zoom_level, window_x, window_y, num_channels):

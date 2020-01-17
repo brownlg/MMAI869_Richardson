@@ -14,6 +14,7 @@ import Richardson_Logger
 
 import richardson_path
 
+
 TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 
 IMG_WINDOW_X = 80
@@ -24,10 +25,8 @@ COLLECT_MAX = 10   #select how many images you want total
 DEFN_FILE = "mySettings.csv"
 
 
-#get list of images to load, based on jpg in file directory
-#img_list = get_file_list(DATA_PATH)
-
-#get list of images with human labels first
+# get list of images to load, based on jpg in file directory
+# get list of images with human labels first
 # get the bounding boxes
 boxes = load_data(richardson_path.META_FILE, richardson_path.META_PATH)
 
@@ -93,11 +92,11 @@ for img_id in img_list:
 		else:
 			identify_non_target = ""
 				
-		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.jpg'
+		clipfilename = str(img_id) + '_' +  str(clip_index) + identify_non_target + '.png'
 		
 		# store data
 		#print(img_clipped.shape)
-		save_image(clipfilename, flag_data_for, img_clipped, False, True)  # needs to be png? or B&W 
+		save_image(clipfilename, flag_data_for, img_clipped, True, False)  # needs to be png? or B&W 
 
 		my_logger.write_line(flag_data_for + "," + key + "," + clipfilename + "\n")	
 		
