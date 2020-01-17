@@ -458,7 +458,8 @@ def cut_out_target(target_label, selected_rows):
     # find the rows with human labels
     for it in target_label:
         #print(it + " >> " + select_rows.LabelName)
-        human_row = selected_rows.loc[selected_rows.LabelName == it]
+        # human_row = selected_rows.loc([selected_rows.LabelName == it) & (selected_rows.IsDepiction == 0)]
+        human_row = selected_rows[(selected_rows['LabelName'] == it) & (selected_rows['IsDepiction'] == 0)]
         #print(human_row.head())
         if (len(my_rows.index) == 0):
             my_rows = human_row
