@@ -19,7 +19,7 @@ my_model = load_model("my_classifier_soft_max_2.h5")
 #file_to_scan = "00cdf56c63191fd3.jpg"  # beach 
 #file_to_scan = "0a1aee5d7701ce5c_1.jpg"  # 
 #file_to_scan = "0a1aee5d7701ce5c_2F.jpg"  #
-file_to_scan = "TTC_example2.jpg"
+file_to_scan = "0000a4e648c5897f.jpg"
 
 my_image = file_handler.load_image(file_to_scan, "",True)[0]
 

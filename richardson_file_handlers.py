@@ -24,8 +24,10 @@ def load_image(datafile, path = "", flag_bw_load = False):
             print("error trying to load")
             return None
     else:
+        
         try:
             img = load_img(file_path)  # this is a PIL image
+          
         except:
             print("error trying to load")
             return None

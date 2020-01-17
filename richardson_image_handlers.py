@@ -31,8 +31,8 @@ def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
     y_min = 0
     x_max = x_min + window_x
     y_max = y_min + window_y
-    step_x = 3
-    step_y = 3
+    step_x = 50
+    step_y = 50
     steps_x =  int((img_width - window_x) /step_x)
     steps_y = int((img_height - window_y) / step_y)
 
