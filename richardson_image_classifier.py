@@ -62,13 +62,16 @@ from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 model = Sequential()
 #model.add(Conv2D(WINDOW_X * WINDOW_Y, kernel_size=(3,3), activation='relu', padding = 'same' input_shape=input_shape))
 
-model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(128, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
 
 model.add(Conv2D(512, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
+model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
 model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+model.add(Dense(128, activation=tf.nn.relu))
 model.add(Dense(128, activation=tf.nn.relu))
 model.add(Dropout(0.2))
 
@@ -86,29 +89,28 @@ model.compile(optimizer='adam',
 #              metrics=['mse'])
 
 
-model.fit(x=x_train, y=y_train, batch_size = 64, epochs = 10)
+model.fit(x=x_train, y=y_train, batch_size = 128, epochs = 3)
 
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
 
 model.save('my_classifier_soft_max_2.h5')
 
+
+
+print("deleting old file 1")
+if os.path.exists(os.path.join("trained_model_results", "ZZ-my_results.csv")):
+	os.remove(os.path.join("trained_model_results", "ZZ-my_results.csv"))
+print("deleting old file 2")
+if os.path.exists(os.path.join("trained_model_results", "ZZ-x_test_files.csv")):
+	os.remove(os.path.join("trained_model_results", "ZZ-x_test_files.csv"))
+
+
 results = model.predict(x_test)
 
-np.savetxt("ZZ-my_results.csv", results, delimiter = ',')
-#np.savetxt("ZZ-x_test.csv", x_test, delimiter = ',')
-
-files_txt = r_logger.R_logger("ZZ-x_test_files.csv")
+np.savetxt(os.path.join("trained_model_results", "ZZ-my_results.csv"), results, delimiter = ',')
+files_txt = r_logger.R_logger(os.path.join("trained_model_results", "ZZ-x_test_files.csv"))
 
 for row in x_test_files:
     files_txt.write_line(row + '\n')
-
 files_txt.close()
-
-
-#np.savetxt("ZZ-y_test.csv", y_test, delimiter = ',')
-
-
-# my_model = model.load("")
-# my_model.predict()
-# probability true  = prediction[:,1]

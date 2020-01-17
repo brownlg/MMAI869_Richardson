@@ -97,7 +97,7 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
     cc=0
     for file_name in file_list:
         # open the file add to array
-        img = load_image(file_name, file_path, True)  # this is a PIL image
+        img = load_image(file_name, file_path, False)  # this is a PIL image
       
         img_arr[cc] = img[0]
 
