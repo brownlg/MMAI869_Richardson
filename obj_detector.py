@@ -21,7 +21,8 @@ my_model.summary()
 #file_to_scan = "00cdf56c63191fd3.jpg"  # beach 
 #file_to_scan = "0a1aee5d7701ce5c_1.jpg"  # 
 #file_to_scan = "0a1aee5d7701ce5c_2F.jpg"  #
-file_to_scan = "TTC_example2-test.jpg"
+#file_to_scan = "TTC_example2-test.jpg"
+file_to_scan = "IMG-20200109-WA0000.jpg"
 
 my_image = file_handler.load_image(file_to_scan, "", flag_bw_load=False)[0]
 
@@ -37,7 +38,7 @@ print("done")
 # draw the boxes on the image
 cc=0
 for result in results:    
-    if (result[1] > 0.9995):
+    if (result[1] > 0.9999):
         #person found, draw the box
         box = list_of_boxes[cc]
         #draw rectangle

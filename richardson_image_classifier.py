@@ -19,6 +19,34 @@ from keras import backend as K
 import matplotlib.pyplot as plt
 
 max_images = 1000000
+input_shape = (WINDOW_Y, WINDOW_X, 3)
+
+# Importing the required Keras modules containing model and layers
+from keras.models import Sequential
+from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
+
+# Creating a Sequential Model and adding the layers
+model = Sequential()
+#model.add(Conv2D(128, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.2))
+
+# soft-max is for multi-class ?? so i think we need to use sigmoid?
+#model.add(Dense(1,activation=tf.nn.tanh))  
+#model.add(Dense(2,activation=tf.nn.tanh))
+model.add(Dense(2, activation='softmax'))  
+
+model.compile(optimizer='adam', 
+              loss='sparse_categorical_crossentropy', 
+              metrics=['accuracy' ])
+
+#model.compile(optimizer='adam', 
+#              loss='sparse_categorical_crossentropy', 
+#              metrics=['mse'])
 
 print("Loading dictionary for y_train...")
 my_logger = r_logger.R_logger(os.path.join(my_paths.INFO_PATH, "data.csv"))
@@ -44,7 +72,7 @@ print('Number of images in x_test', x_test.shape[0])
 # Reshaping the array to 4-dims so that it can work with the Keras API
 #x_train = x_train.reshape(x_train.shape[0], WINDOW_X, WINDOW_Y, 1)
 #x_test = x_test.reshape(x_test.shape[0], WINDOW_X, WINDOW_Y, 1)
-input_shape = (WINDOW_Y, WINDOW_X, 3)
+
 
 
 print("Get y values...")
@@ -54,39 +82,6 @@ y_test = image_handler.get_y_value(x_test_files, my_y_values, my_paths.human_lab
 #create y_train and y_test values
 
 
-# Importing the required Keras modules containing model and layers
-from keras.models import Sequential
-from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
-
-# Creating a Sequential Model and adding the layers
-model = Sequential()
-#model.add(Conv2D(WINDOW_X * WINDOW_Y, kernel_size=(3,3), activation='relu', padding = 'same' input_shape=input_shape))
-
-model.add(Conv2D(128, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
-
-model.add(Conv2D(512, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
-model.add(Dense(128, activation=tf.nn.relu))
-model.add(Dense(128, activation=tf.nn.relu))
-model.add(Dropout(0.2))
-
-# soft-max is for multi-class ?? so i think we need to use sigmoid?
-#model.add(Dense(1,activation=tf.nn.tanh))  
-#model.add(Dense(2,activation=tf.nn.tanh))
-model.add(Dense(2, activation='softmax'))  
-
-model.compile(optimizer='adam', 
-              loss='sparse_categorical_crossentropy', 
-              metrics=['accuracy' ])
-
-#model.compile(optimizer='adam', 
-#              loss='sparse_categorical_crossentropy', 
-#              metrics=['mse'])
 
 
 model.fit(x=x_train, y=y_train, batch_size = 128, epochs = 3)
