@@ -38,7 +38,7 @@ print("done")
 # draw the boxes on the image
 cc=0
 for result in results:    
-    if (result[1] > 0.9999):
+    if (result[1] > 0.95):
         #person found, draw the box
         box = list_of_boxes[cc]
         #draw rectangle
