@@ -20,7 +20,11 @@ TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 IMG_WINDOW_X = 80
 IMG_WINDOW_Y = 80
 
+<<<<<<< HEAD
 COLLECT_MAX = 35000   #select how many images you want total
+=======
+COLLECT_MAX = 100   #select how many images you want total
+>>>>>>> master
 
 DEFN_FILE = "mySettings.csv"
 
