@@ -18,9 +18,8 @@ from keras import backend as K
 #print(K.tensorflow_backend._get_available_gpus())
 import matplotlib.pyplot as plt
 
-max_images = 100
+max_images = 1000
 input_shape = (WINDOW_Y, WINDOW_X, 3)
-
 
 print("Loading dictionary for y_train...")
 my_logger = r_logger.R_logger(os.path.join(my_paths.INFO_PATH, "data.csv"))
@@ -68,14 +67,11 @@ model = Sequential()
 model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
-model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dense(64, activation=tf.nn.relu))
 model.add(Dropout(0.2))
 model.add(Dense(2, activation='softmax'))  
 
@@ -88,22 +84,38 @@ model.fit(x=x_train, y=y_train, batch_size = 6, epochs = 3)
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
 
-#model.save('my_classifier_soft_max_2.h5')
+print("Saving model...")
+model.save('my_classifier_soft_max_2.h5')
 
 print("deleting old file 1")
-if os.path.exists(os.path.join("trained_model_results", "ZZ-my_results.csv")):
-	os.remove(os.path.join("trained_model_results", "ZZ-my_results.csv"))
-print("deleting old file 2")
-if os.path.exists(os.path.join("trained_model_results", "ZZ-x_test_files.csv")):
-	os.remove(os.path.join("trained_model_results", "ZZ-x_test_files.csv"))
+if os.path.exists(os.path.join("trained_model_results", "test_results_summary.csv")):
+	os.remove(os.path.join("trained_model_results", "test_results_summary.csv"))
 
+print("deleting old result files")
+PATH_CORRECT = "prediction_is_correct"
+for filename in os.listdir(os.path.join("trained_model_results" , PATH_CORRECT)):
+	os.remove(os.path.join("trained_model_results", PATH_CORRECT, filename))
+
+print("Predicting results")
 results = model.predict(x_test)
 
+print("Saving results")
 np.savetxt(os.path.join("trained_model_results", "test_results_summary.csv"), results, delimiter = ',')
 files_txt = r_logger.R_logger(os.path.join("trained_model_results", "test_results_summary.csv"))
 
+result_table = []
 for i in range(0, results.shape[0]):
     files_txt.write_line(x_test_files[i] + "," + str(results[i, 0]) + "," + str(results[i, 1]) + '\n')
-
-    
+    result_table.append((results[i,0], results[i, 1], x_test_files[i]))
 files_txt.close()
+
+print("Copying clips to folders for easy breezy viewing")
+import shutil 
+import operator
+
+result_table.sort(key = operator.itemgetter(0))
+
+for iter in result_table:
+    file_name = iter[2]
+    prob_correct = str(int(round(iter[0]*100, 0))).zfill(3)
+    shutil.copy(os.path.join(my_paths.VALIDATION_PATH, file_name), os.path.join("trained_model_results", PATH_CORRECT, prob_correct + "_" + file_name))
