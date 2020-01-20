@@ -104,8 +104,8 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
         img_arr[cc] = img[0]
 
         cc = cc + 1
-        if (cc >= max_limit):
+        if (cc >= number_of_files):
             break
 
-    return img_arr, file_list
+    return img_arr, file_list[:number_of_files]
 

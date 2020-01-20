@@ -18,9 +18,8 @@ from keras import backend as K
 #print(K.tensorflow_backend._get_available_gpus())
 import matplotlib.pyplot as plt
 
-max_images = 1000000
+max_images = 1000
 input_shape = (WINDOW_Y, WINDOW_X, 3)
-
 
 print("Loading dictionary for y_train...")
 my_logger = r_logger.R_logger(os.path.join(my_paths.INFO_PATH, "data.csv"))
@@ -54,6 +53,8 @@ y_train = image_handler.get_y_value(x_train_files, my_y_values, my_paths.human_l
 y_test = image_handler.get_y_value(x_test_files, my_y_values, my_paths.human_labels)
 
 #create y_train and y_test values
+print('Number of images in y_train', y_train.shape[0])
+print('Number of images in y_test', y_test.shape[0])
 
 
 # Importing the required Keras modules containing model and layers
@@ -66,53 +67,55 @@ model = Sequential()
 model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
 
 model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
-model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dense(64, activation=tf.nn.relu))
 model.add(Dropout(0.2))
-
-# soft-max is for multi-class ?? so i think we need to use sigmoid?
-#model.add(Dense(1,activation=tf.nn.tanh))  
-#model.add(Dense(2,activation=tf.nn.tanh))
 model.add(Dense(2, activation='softmax'))  
 
 model.compile(optimizer='adam', 
               loss='sparse_categorical_crossentropy', 
               metrics=['accuracy' ])
 
-#model.compile(optimizer='adam', 
-#              loss='sparse_categorical_crossentropy', 
-#              metrics=['mse'])
-
-
-model.fit(x=x_train, y=y_train, batch_size = 128, epochs = 3)
+model.fit(x=x_train, y=y_train, batch_size = 6, epochs = 3)
 
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
 
+print("Saving model...")
 model.save('my_classifier_soft_max_2.h5')
 
-
-
 print("deleting old file 1")
-if os.path.exists(os.path.join("trained_model_results", "ZZ-my_results.csv")):
-	os.remove(os.path.join("trained_model_results", "ZZ-my_results.csv"))
-print("deleting old file 2")
-if os.path.exists(os.path.join("trained_model_results", "ZZ-x_test_files.csv")):
-	os.remove(os.path.join("trained_model_results", "ZZ-x_test_files.csv"))
+if os.path.exists(os.path.join("trained_model_results", "test_results_summary.csv")):
+	os.remove(os.path.join("trained_model_results", "test_results_summary.csv"))
 
+print("deleting old result files")
+PATH_CORRECT = "prediction_is_correct"
+for filename in os.listdir(os.path.join("trained_model_results" , PATH_CORRECT)):
+	os.remove(os.path.join("trained_model_results", PATH_CORRECT, filename))
 
+print("Predicting results")
 results = model.predict(x_test)
 
-np.savetxt(os.path.join("trained_model_results", "ZZ-my_results.csv"), results, delimiter = ',')
-files_txt = r_logger.R_logger(os.path.join("trained_model_results", "ZZ-x_test_files.csv"))
+print("Saving results")
+np.savetxt(os.path.join("trained_model_results", "test_results_summary.csv"), results, delimiter = ',')
+files_txt = r_logger.R_logger(os.path.join("trained_model_results", "test_results_summary.csv"))
 
-for row in x_test_files:
-    files_txt.write_line(row + '\n')
+result_table = []
+for i in range(0, results.shape[0]):
+    files_txt.write_line(x_test_files[i] + "," + str(results[i, 0]) + "," + str(results[i, 1]) + '\n')
+    result_table.append((results[i,0], results[i, 1], x_test_files[i]))
 files_txt.close()
+
+print("Copying clips to folders for easy breezy viewing")
+import shutil 
+import operator
+
+result_table.sort(key = operator.itemgetter(0))
+
+for iter in result_table:
+    file_name = iter[2]
+    prob_correct = str(int(round(iter[0]*100, 0))).zfill(3)
+    shutil.copy(os.path.join(my_paths.VALIDATION_PATH, file_name), os.path.join("trained_model_results", PATH_CORRECT, prob_correct + "_" + file_name))
