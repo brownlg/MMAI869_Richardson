@@ -4,14 +4,16 @@ import cv2
 import os
 
 #dimensions of input image
-WINDOW_X = 80
-WINDOW_Y = 80
+WINDOW_X = 128  
+WINDOW_Y = 128
 
 # load the trained neural network
 from keras.models import load_model
 #my_model = load_model("my_classifier_soft_max_2.h5") # works on faces, 1st one that actually seemed to work
 #my_model = load_model("my_classifier_soft_max_2.h5") 
-my_model = load_model("my_classifier_soft_max_2.h5") 
+#my_model = load_model("my_classifier_soft_max_2.h5") 
+my_model = load_model("stream2Pre_classifier.h5")
+
 
 my_model.summary()
 
@@ -22,7 +24,7 @@ my_model.summary()
 #file_to_scan = "0a1aee5d7701ce5c_1.jpg"  # 
 #file_to_scan = "0a1aee5d7701ce5c_2F.jpg"  #
 #file_to_scan = "TTC_example2-test.jpg"
-file_to_scan = "IMG-20200109-WA0000.jpg"
+file_to_scan = "016feb7bf9748149.jpg"
 
 my_image = file_handler.load_image(file_to_scan, "", flag_bw_load=False)[0]
 
