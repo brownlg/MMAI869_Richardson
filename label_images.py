@@ -40,14 +40,12 @@ class_definitions = load_data(richardson_path.CLASS_FILE, richardson_path.META_P
 
 print(boxes.head())
 
+# for each target label pull the rows
 img_list = []
-for label_name in richardson_path.human_labels:
-	rows_human = boxes.loc[boxes.LabelName == label_name]
-	
-	#create a list
-	for row in rows_human.ImageID:
-		if row not in img_list:  # make sure you only have unique entries!
-			img_list.append(row)
+
+# filter out drawings
+rows_human = boxes.loc[(boxes.IsDepiction == 0)]
+img_list = list(dict.fromkeys(rows_human['ImageID']))
 
 unique_number = -1 
 for image in img_list:
@@ -67,6 +65,6 @@ for image in img_list:
     x2 = """{ "license": 1, "file_name": " """ + image + """.jpg", "height": """ + str(height) + """, "width": """ + str(width) + """, "date_captured": "2020-01-31 01:02:03", "id": """ + image +  """ }"""
 
     # append to a file    
-    with open(os.path.join(richardson_path.ATT_PATH , richardson_path.ATT_ANNOTATION_PATH) + richardson_path.ATT_TRAIN_FILE, 'a') as outfile:
-        json.dump(x1 + x2, outfile)
+    with open(os.path.join(richardson_path.ATT_PATH , richardson_path.ATT_ANNOTATION_PATH, richardson_path.ATT_TRAIN_FILE), 'a') as outfile:
+        json.dump(x1 + x2, outfile, ensure_ascii=False)
     

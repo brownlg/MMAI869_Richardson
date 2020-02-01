@@ -452,6 +452,29 @@ def zoom_to_fit_box(box_width, box_height, my_image):
     #no change to image required
     return my_image
 
+def is_overlap(test_index, boxes):    
+    if (len(boxes) <= 1):
+        return False # there is nothing to compare to
+
+    test_box = boxes[test_index]
+    # XMin	XMax	YMin	YMax
+    b1 = BBox2D([test_box['XMin'], test_box['YMin'],test_box['XMax'],test_box['YMax']])
+    
+    flag_inside = False
+    for i in range(0, len(boxes)):
+        if (i == test_index):
+            continue
+
+        box = boxes[i]
+        b2 = BBox2D([box['XMin'], box['YMin'],box['XMax'],box['YMax']])
+
+        iou = jaccard_index_2d(b1, b2)
+
+        if (iou > 0.1):
+            flag_inside = True
+            break
+    
+    return flag_inside
 
 def create_caption(image, boxes, class_definitions):
     # lets limit the number of labels to process
@@ -467,6 +490,7 @@ def create_caption(image, boxes, class_definitions):
 
     print(my_rows)
 
+    #create a list of rows that are of our target
     image_rows = [] # create list 
     for row_tuples in my_rows.iterrows():
         row = row_tuples[1]
@@ -477,36 +501,47 @@ def create_caption(image, boxes, class_definitions):
 
         if my_str in filter_allow.keys():
             image_rows.append(row)
-        
+            
+    #process each row to generate a caption
     if (len(image_rows) == 0):
         # no labels that we care about
         image_caption = image_caption + "of nothing important"
-    else:        
-        #create a caption
-        cc = 0 
-        for row in image_rows:
-            # get the class based on label name
-            #class_name = class_definitions[0]
-            cc = cc + 1
-            if cc == 1:
-                count_str = "first"
-            elif cc == 2:
-                count_str = "second"
-            elif cc == 3:
-                count_str = "third"
-            elif cc == 4:
-                count_str = "fourth"
-            elif cc == 5:
-                count_str = "fifth"
-            elif cc == 6:
-                count_str = "sixth"
-            else:
-                count_str = "many"
+        return image_caption
 
-            class_name = filter_allow[row['LabelName']]
-            ## I am overriding to make simpler
-            class_name = "head"
-            image_caption = image_caption + "of a " + count_str + " " + class_name + " , and "
+    #remove overlaps
+    image_rows_unique = []
+    for row_index in range(0, len(image_rows)):
+        # filter out overlapping boxes
+        if (row_index == 0):
+            image_rows_unique.append(image_rows[row_index])            
+        elif (is_overlap(row_index, image_rows) is not True):
+            image_rows_unique.append(image_rows[row_index])
+                    
+    #create a caption
+    cc = 0 
+    for row in image_rows_unique:
+        # get the class based on label name
+        #class_name = class_definitions[0]
+        cc = cc + 1
+        if cc == 1:
+            count_str = "first"
+        elif cc == 2:
+            count_str = "second"
+        elif cc == 3:
+            count_str = "third"
+        elif cc == 4:
+            count_str = "fourth"
+        elif cc == 5:
+            count_str = "fifth"
+        elif cc == 6:
+            count_str = "sixth"
+        else:
+            count_str = "many"
+
+        class_name = filter_allow[row['LabelName']]
+        ## I am overriding to make simpler
+        class_name = "head"
+        image_caption = image_caption + "of a " + count_str + " " + class_name + " , and "
             
     return image_caption
 
