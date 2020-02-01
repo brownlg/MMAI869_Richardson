@@ -23,7 +23,7 @@ TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 IMG_WINDOW_X = 128
 IMG_WINDOW_Y = 128
 
-COLLECT_MAX = 1000   #select how many images you want total
+COLLECT_MAX = 30000   #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 
@@ -38,7 +38,7 @@ if os.path.exists(os.path.join(richardson_path.ATT_PATH , richardson_path.ATT_AN
 boxes = load_data(richardson_path.META_FILE, richardson_path.META_PATH)
 class_definitions = load_data(richardson_path.CLASS_FILE, richardson_path.META_PATH)
 
-print(boxes.head())
+#print(boxes.head())
 
 # for each target label pull the rows
 img_list = []
@@ -48,11 +48,12 @@ rows_human = boxes.loc[(boxes.IsDepiction == 0)]
 img_list = list(dict.fromkeys(rows_human['ImageID']))
 
 unique_number = -1 
+arr = []
 for image in img_list:
     #load the image to get dimensions
-    img_nparray = load_image(image + ".jpg", richardson_path.DATA_PATH, False)
-    width = img_nparray.shape[1]
-    height = img_nparray.shape[2]
+    #img_nparray = load_image(image + ".jpg", richardson_path.DATA_PATH, False)
+    #width = img_nparray.shape[1]
+    #height = img_nparray.shape[2]
 
     unique_number = unique_number + 1
     # get the boxes for this image    
@@ -61,10 +62,31 @@ for image in img_list:
     # save the caption in the format required
 
     # save as JSON:
-    x1 =  '{ "image_id": '+ image + ', "id": '+ str(unique_number) +', "caption": "' + caption + '" }'
-    x2 = """{ "license": 1, "file_name": " """ + image + """.jpg", "height": """ + str(height) + """, "width": """ + str(width) + """, "date_captured": "2020-01-31 01:02:03", "id": """ + image +  """ }"""
+    x1 =  { 
+        "image_id": image, 
+        "id": unique_number,
+        "caption": caption
+        }
 
-    # append to a file    
-    with open(os.path.join(richardson_path.ATT_PATH , richardson_path.ATT_ANNOTATION_PATH, richardson_path.ATT_TRAIN_FILE), 'a') as outfile:
-        json.dump(x1 + x2, outfile, ensure_ascii=False)
+    #x2 =  { 
+    #    "license": 1,
+    #    "file_name": image + '.jpg',
+    #    "height": height,
+    #    "width": width,
+    #    "date_captured": "2020-01-31 01:02:03",
+    #    "id": image
+    #    }
+
+    arr.append(x1)
+
+    if unique_number % 1000 == 0:
+        print("processed another 1000 files...")
+        
+    if(unique_number > COLLECT_MAX):
+        break
+
+# append to a file    
+with open(os.path.join(richardson_path.ATT_PATH , richardson_path.ATT_ANNOTATION_PATH, richardson_path.ATT_TRAIN_FILE), 'a') as outfile:        
+    json.dump(arr, outfile, ensure_ascii=False)
+    #json.dump(x2, outfile, ensure_ascii=False)
     

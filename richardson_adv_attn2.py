@@ -19,36 +19,14 @@ from glob import glob
 from PIL import Image
 import pickle
 
-#root path
-root_path = os.path.join("d:", "temp_lucas")
-
-# Download caption annotation files
-annotation_folder = os.path.join(root_path, 'annotations')
-
-if not os.path.exists(annotation_folder):
-  annotation_zip = tf.keras.utils.get_file('captions.zip',
-                                          cache_subdir=os.path.abspath(root_path),
-                                          origin = 'http://images.cocodataset.org/annotations/annotations_trainval2014.zip',
-                                          extract = True)
-  annotation_file = os.path.dirname(annotation_zip)+'/annotations/captions_train2014.json'
-  os.remove(annotation_zip)
+import richardson_path
 
 
 # Download image files
-image_folder = 'train2014'
-if not os.path.exists(os.path.join(root_path, image_folder)):
-  image_zip = tf.keras.utils.get_file('train2014.zip',
-                                      cache_subdir=os.path.abspath(root_path),
-                                      origin = 'http://images.cocodataset.org/zips/train2014.zip',
-                                      extract = True)
-  PATH = os.path.join(root_path, image_folder)
-  os.remove(image_zip)
-else:
-  PATH = os.path.join(root_path, image_folder)
-
+image_folder = os.path.join(richardson_path.DATA_PATH)
 
 # Read the json file
-annotation_file = os.path.join(annotation_folder, 'captions_train2014.json')
+annotation_file = os.path.join(richardson_path.ATT_PATH, richardson_path.ATT_ANNOTATION_PATH, richardson_path.ATT_TRAIN_FILE)
 with open(annotation_file, 'r') as f:
     annotations = json.load(f)
 
@@ -56,10 +34,10 @@ with open(annotation_file, 'r') as f:
 all_captions = []
 all_img_name_vector = []
 
-for annot in annotations['annotations']:
+for annot in annotations:
     caption = '<start> ' + annot['caption'] + ' <end>'
     image_id = annot['image_id']
-    full_coco_image_path = os.path.join(PATH, 'COCO_train2014_' + '%012d.jpg' % (image_id))
+    full_coco_image_path = os.path.join(richardson_path.DATA_PATH, image_id + '.jpg')
 
     all_img_name_vector.append(full_coco_image_path)
     all_captions.append(caption)
@@ -68,10 +46,10 @@ for annot in annotations['annotations']:
 # Set a random state
 train_captions, img_name_vector = shuffle(all_captions,
                                           all_img_name_vector,
-                                          random_state=1)
+                                          random_state=42)
 
 # Select the first 30000 captions from the shuffled set
-num_examples = 30000
+num_examples = 1000
 train_captions = train_captions[:num_examples]
 img_name_vector = img_name_vector[:num_examples]
 
@@ -270,6 +248,7 @@ def loss_function(real, pred):
 
   return tf.reduce_mean(loss_)
 
+root_path = os.path.join("d:", "temp_lucas")
 checkpoint_path = os.path.join(root_path, "checkpoints" , "train")
 ckpt = tf.train.Checkpoint(encoder=encoder,
                            decoder=decoder,

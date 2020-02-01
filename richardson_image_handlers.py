@@ -488,14 +488,14 @@ def create_caption(image, boxes, class_definitions):
     # select rows for this image
     my_rows = boxes[(boxes['ImageID'] == image)]
 
-    print(my_rows)
+    #print(my_rows)
 
     #create a list of rows that are of our target
     image_rows = [] # create list 
     for row_tuples in my_rows.iterrows():
         row = row_tuples[1]
-        print(row)
-        type(row)
+        #print(row)
+        #type(row)
 
         my_str = row['LabelName']
 
