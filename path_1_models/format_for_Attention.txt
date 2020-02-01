@@ -1,0 +1,19 @@
+COCO_train2014_000000581921
+
+{
+"image_id": 581921,
+"id": 496930,
+"caption": "THERE IS A MAN THAT IS JUMPING HIGH ON A SNOW BOARD"
+}
+
+
+{
+"license": 1,
+"file_name": "COCO_train2014_000000581921.jpg",
+"coco_url": "http://images.cocodataset.org/train2014/COCO_train2014_000000581921.jpg",
+"height": 427,
+"width": 640,
+"date_captured": "2013-11-20 13:14:15",
+"flickr_url": "http://farm4.staticflickr.com/3612/3348961791_a229740c7c_z.jpg",
+"id": 581921
+}

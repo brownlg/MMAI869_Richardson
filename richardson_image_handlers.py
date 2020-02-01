@@ -452,6 +452,64 @@ def zoom_to_fit_box(box_width, box_height, my_image):
     #no change to image required
     return my_image
 
+
+def create_caption(image, boxes, class_definitions):
+    # lets limit the number of labels to process
+    filter_allow = {
+		"/m/0dzct" : "Human Face",
+		"/m/04hgtk": "Human Head"
+	}
+
+    image_caption = "An image "
+
+    # select rows for this image
+    my_rows = boxes[(boxes['ImageID'] == image)]
+
+    print(my_rows)
+
+    image_rows = [] # create list 
+    for row_tuples in my_rows.iterrows():
+        row = row_tuples[1]
+        print(row)
+        type(row)
+
+        my_str = row['LabelName']
+
+        if my_str in filter_allow.keys():
+            image_rows.append(row)
+        
+    if (len(image_rows) == 0):
+        # no labels that we care about
+        image_caption = image_caption + "of nothing important"
+    else:        
+        #create a caption
+        cc = 0 
+        for row in image_rows:
+            # get the class based on label name
+            #class_name = class_definitions[0]
+            cc = cc + 1
+            if cc == 1:
+                count_str = "first"
+            elif cc == 2:
+                count_str = "second"
+            elif cc == 3:
+                count_str = "third"
+            elif cc == 4:
+                count_str = "fourth"
+            elif cc == 5:
+                count_str = "fifth"
+            elif cc == 6:
+                count_str = "sixth"
+            else:
+                count_str = "many"
+
+            class_name = filter_allow[row['LabelName']]
+            ## I am overriding to make simpler
+            class_name = "head"
+            image_caption = image_caption + "of a " + count_str + " " + class_name + " , and "
+            
+    return image_caption
+
 def cut_out_target(target_label, selected_rows):
     my_rows = pd.DataFrame()
     
