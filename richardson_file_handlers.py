@@ -71,7 +71,7 @@ def get_file_list(path = "", ext = "jpg"):
 
     return file_list
 
-def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, window_x=10, window_y=10, num_channels = 1):
+def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, window_x=10, window_y=10, num_channels = 1, scale = False):
     file_list = []
     
     for root, dirs, files in os.walk(file_path):
@@ -83,7 +83,7 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
     # to remove None values in list 
     res = [] 
     for val in file_list: 
-        if val is not None : 
+        if (val is not None) and (".txt" not in val):
             res.append(val) 
 
     file_list = res
@@ -98,10 +98,14 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
 
     cc=0
     for file_name in file_list:
-        # open the file add to array
+        # open the file add to array    
         img = load_image(file_name, file_path, False)  # this is a PIL image
-      
-        img_arr[cc] = img[0]
+
+        if scale == True:
+            img = cv2.resize(img[0], dsize=(int(window_x), int(window_y)), interpolation=cv2.INTER_CUBIC)
+            img_arr[cc] = img
+        else:
+            img_arr[cc] = img[0]
 
         cc = cc + 1
         if (cc >= number_of_files):

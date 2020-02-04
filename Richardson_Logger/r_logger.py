@@ -21,12 +21,12 @@ class R_logger:
         self.f.writelines(data)
         self.f.close()
     
-    def load_dictionary(self):
+    def load_dictionary(self, key_index = 2, value_index = 1):
         my_dictionary = {}
 
         with open(self.filename, mode='r') as infile:
             reader = csv.reader(infile)
-            my_dictionary = { rows[2]:rows[1] for rows in reader }
+            my_dictionary = { rows[key_index]:rows[value_index] for rows in reader }
 
         return my_dictionary
     
