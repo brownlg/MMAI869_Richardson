@@ -75,7 +75,7 @@ image_features_extract_model = tf.keras.Model(new_input, hidden_layer)
 encode_train = sorted(set(img_name_vector))
 
 # Feel free to change batch_size according to your system configuration
-image_dataset = tf.data.Dataset.from_tensor_slices(encode_train)
+image_dataset = tf.data.Dataset.from_tensor_slices(encode_train)  # slice the tensor
 image_dataset = image_dataset.map(load_image, num_parallel_calls=tf.data.experimental.AUTOTUNE).batch(16)
 
 for img, path in image_dataset:

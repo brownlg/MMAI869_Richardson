@@ -19,14 +19,14 @@ import richardson_image_handlers as image_handler
 from Richardson_Logger import r_logger
 
 #dimensions of input image
-WINDOW_X = 80
-WINDOW_Y = 80
+WINDOW_X = 200
+WINDOW_Y = 200
 
 from keras import backend as K
 #print(K.tensorflow_backend._get_available_gpus())
 import matplotlib.pyplot as plt
 
-max_images = 1000
+max_images = 10000
 input_shape = (WINDOW_Y, WINDOW_X, 3)
 
 print("Loading dictionary for y_train...")
@@ -109,8 +109,7 @@ model = Sequential()
 model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(16, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
 
 model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
 model.add(Dense(128, activation=tf.nn.relu))
@@ -122,7 +121,7 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy', 
               metrics=['accuracy' ])
 
-model.fit(x=x_train, y=y_train, batch_size = 10, epochs = 20)
+model.fit(x=x_train, y=y_train, batch_size = 10, epochs = 10) 
 
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)

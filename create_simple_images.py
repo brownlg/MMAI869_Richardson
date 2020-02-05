@@ -45,13 +45,19 @@ for i in range(0, image_max):
 
     if obj_type == 1:
         img_label = "line"
-        cv2.line(img,(x,y),(x+x_size, y+y_size),(r,g,b),50)
+        cv2.line(img,(0,0),(150, 200),(255,0,0),50)
+
+        #cv2.line(img,(x,y),(x+x_size, y+y_size),(r,g,b),50)
     elif obj_type == 2:
         img_label = "rectangle"
-        cv2.rectangle(img,(x,y),(x+x_size,y+y_size),(r,g,b),15)
+        #cv2.rectangle(img,(x,y),(x+x_size,y+y_size),(r,g,b),15)
+        cv2.rectangle(img,(150,60),(200,350),(0,255,0),15)
+
+
     elif obj_type == 3:
         img_label = "circle"
-        cv2.circle(img,(x,y), int(x_size/2), (r,g,b), -1)
+        #cv2.circle(img,(x,y), int(x_size/2), (r,g,b), -1)
+        cv2.circle(img,(150,120), int(25), (255,255,255), -1)
     
     img_file_name = "my_test_" + str(i) + "_" + img_label + ".jpg"
     df.loc[i, "Image file"] = img_file_name
