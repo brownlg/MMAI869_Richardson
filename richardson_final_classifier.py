@@ -35,35 +35,7 @@ print("Loading dictionary for y_train...")
 my_logger = r_logger.R_logger(os.path.join(my_paths.INFO_PATH, "shapes_info.csv"))
 my_y_values = my_logger.load_dictionary(key_index = 1, value_index = 2)
 
-#images, image_file_names = file_handler.load_images_for_keras("simple_gen_images", "jpg", max_images, WINDOW_X, WINDOW_Y, num_channels=3, scale=True)
-
-#Preprocess the images using InceptionV3
-def load_image(image_path):
-    img = tf.io.read_file(image_path)
-    img = tf.image.decode_jpeg(img, channels=3)
-    img = tf.image.resize(img, (299, 299))
-    #we are not using inception here!
-    #img = tf.keras.applications.inception_v3.preprocess_input(img)
-    return img, image_path
-
-image_file_names = file_handler.get_file_list("simple_gen_images", "jpg", True)
-
-# Get unique images
-encode_train = sorted(set(image_file_names))
-image_dataset = tf.data.Dataset.from_tensor_slices(encode_train)  # slice the tensor
-image_dataset = image_dataset.map(load_image, num_parallel_calls=tf.data.experimental.AUTOTUNE).batch(16)
-
-#image_features_extract_model = tf.keras.Model(new_input, hidden_layer)
-
-for img, path in image_dataset:
-  #batch_features = image_features_extract_model(img)
-  batch_features = img
-  batch_features = tf.reshape(batch_features, (batch_features.shape[0], -1, batch_features.shape[3]))
-
-  for bf, p in zip(batch_features, path):
-    path_of_feature = p.numpy().decode("utf-8")
-    np.save(path_of_feature, bf.numpy())
-
+images, image_file_names = file_handler.load_images_for_keras("simple_gen_images", "jpg", max_images, WINDOW_X, WINDOW_Y, num_channels=3, scale=True)
 
 shuffle_image, shuffle_image_file_names = shuffle(images, image_file_names, random_state=42)
 
@@ -137,42 +109,29 @@ y_train = np.asarray(y_train, dtype=float)
 x_test = np.asarray(x_test, dtype=float)
 y_test = np.asarray(y_test, dtype=float)
 
-
-# we will cache images so we dont run out of memory
 train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(10000).batch(32)
-#dataset = tf.data.Dataset.from_tensor_slices((img_name_train, cap_train))
-
-# Load the numpy files
-def map_func(img_name, cap):
-  img_tensor = np.load(img_name.decode('utf-8')+'.npy')
-  return img_tensor, cap
-
-# Use map to load the numpy files in parallel
-train_ds = train_ds.map(lambda item1, item2: tf.numpy_function(
-          map_func, [item1, item2], [tf.float32, tf.int32]),
-          num_parallel_calls=tf.data.experimental.AUTOTUNE)
-
-# Shuffle and batch
-train_ds = train_ds.shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-train_ds = train_ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
 test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
 
 
 
 class MyModel(Model):
-  def __init__(self):
-    super(MyModel, self).__init__()
-    self.conv1 = Conv2D(32, 3, activation='relu')
-    self.flatten = Flatten()
-    self.d1 = Dense(128, activation='relu')
-    self.d2 = Dense(10, activation='softmax')
+    def __init__(self):
+        super(MyModel, self).__init__()
+        self.conv1 = Conv2D(32, 3, activation='relu')        
+        self.flatten = Flatten()
+        self.d1 = Dense(128, activation='relu')
+        self.d2 = Dense(10, activation='softmax')
 
-  def call(self, x):
-    x = self.conv1(x)
-    x = self.flatten(x)
-    x = self.d1(x)
-    return self.d2(x)
+    def maxpool2d(self, x, k=2):
+        return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1],padding='SAME')
+
+    def call(self, x):
+        x = self.conv1(x)
+        x = self.maxpool2d(x)
+        x = self.flatten(x)
+        x = self.d1(x)
+        return self.d2(x)
 
 # Create an instance of the model
 model = MyModel()
@@ -215,7 +174,7 @@ def test_step(images, labels):
   test_accuracy(labels, predictions)
 
 
-EPOCHS = 20
+EPOCHS = 5
 
 for epoch in range(EPOCHS):
   # Reset the metrics at the start of the next epoch
@@ -224,11 +183,8 @@ for epoch in range(EPOCHS):
   test_loss.reset_states()
   test_accuracy.reset_states()
 
-  for (batch, (img_tensor, target)) in enumerate(train_ds):
-      train_step(img_tensor, target)
-
-  #for images, labels in train_ds:
-  #  train_step(images, labels)
+  for images, labels in train_ds:
+    train_step(images, labels)
 
   for test_images, test_labels in test_ds:
     test_step(test_images, test_labels)
@@ -239,4 +195,3 @@ for epoch in range(EPOCHS):
                         train_accuracy.result()*100,
                         test_loss.result(),
                         test_accuracy.result()*100))
-

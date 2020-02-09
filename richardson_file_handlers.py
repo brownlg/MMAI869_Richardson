@@ -63,11 +63,15 @@ def load_data(datafile, path = ''):
     return pd.read_csv(csv_path, encoding='latin-1')
 
 #get list of files in a directory
-def get_file_list(path = "", ext = "jpg"):
+def get_file_list(path = "", ext = "jpg", flag_include_path = False):
 
+    flag_include_path = False
     file_list = []
     for root, dirs, files in os.walk(path):
-        file_list = file_list + files
+        if flag_include_path == False:
+            file_list = file_list + files
+        else:            
+            file_list = file_list + str(os.path.join(path, files))
 
     return file_list
 

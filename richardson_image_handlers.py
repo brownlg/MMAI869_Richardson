@@ -7,7 +7,7 @@ from bbox.metrics import jaccard_index_2d, BBox2D
 import richardson_path
 
 BLUR_SIZE = 21
-FALSE_RATIO = 3
+FALSE_RATIO = 1
 
 
 print(cv2.__version__)
@@ -154,7 +154,7 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
     # copy the bounding box to new image
     
     # load the image
-    my_img = file_handler.load_image(filepath + img_id + ".jpg")
+    my_img = file_handler.load_image(img_id + ".jpg" , filepath)
 
     if (my_img is None):
         return None

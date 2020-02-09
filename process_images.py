@@ -17,10 +17,10 @@ import os
 
 TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 
-IMG_WINDOW_X = 128
-IMG_WINDOW_Y = 128
+IMG_WINDOW_X = 80
+IMG_WINDOW_Y = 80
 
-COLLECT_MAX = 1000   #select how many images you want total
+COLLECT_MAX = 20000   #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 

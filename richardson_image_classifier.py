@@ -18,7 +18,7 @@ from keras import backend as K
 #print(K.tensorflow_backend._get_available_gpus())
 import matplotlib.pyplot as plt
 
-max_images = 1000
+max_images = 20000
 input_shape = (WINDOW_Y, WINDOW_X, 3)
 
 print("Loading dictionary for y_train...")
@@ -79,7 +79,7 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy', 
               metrics=['accuracy' ])
 
-model.fit(x=x_train, y=y_train, batch_size = 6, epochs = 3)
+model.fit(x=x_train, y=y_train, batch_size = 100, epochs = 20)
 
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
