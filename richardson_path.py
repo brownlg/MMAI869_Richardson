@@ -3,6 +3,8 @@ import os
 #setup paths
 DATA_PATH = os.path.join("[target_dir", "validation]")
 META_PATH = os.path.join("[target_dir", "validation]", "Validation Meta data")
+TTC_PATH = os.path.join("[target_dir", "ttc_images")
+
 META_FILE = "validation-annotations-bbox.csv"
 CLASS_FILE = "class-descriptions-boxable.csv"
 
@@ -16,6 +18,7 @@ ATT_ANNOTATION_PATH = 'annotations'
 ATT_VALIDATION_FILE = 'captions_val2020.json'
 ATT_TRAIN_FILE = 'captions_train2020.json'
 
+OBJ_TEST_RESULTS = os.path.join('trained_model_results', 'obj_test_results')
 
 DEBUG_MODE = False
 

@@ -80,6 +80,10 @@ for img_id in img_list:
 	#print(target_rows)
 	clipped_images = richardson_image_handlers.create_clipped_images(img_id, richardson_path.DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
 
+	flag_TTC = True
+	if flag_TTC is True:
+		ttc_background_images = richardson_image_handlers.create_clipped_images("Photo from Luke(2) - use for TTC background.jpg", "", None, IMG_WINDOW_X, IMG_WINDOW_Y)
+
 	if (clipped_images == None):
 		continue
 

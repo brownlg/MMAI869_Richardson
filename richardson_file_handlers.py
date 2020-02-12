@@ -12,7 +12,19 @@ from keras.preprocessing.image import save_img
 
 
 #load image
-def load_image(datafile, path = "", flag_bw_load = False):    
+def load_image(datafile, path = "", flag_bw_load = False):  
+    dummy, file_extension = os.path.splitext(datafile)
+
+    flag_good = False
+    if file_extension == '.png':
+        flag_good = True
+    
+    if file_extension == '.jpg':
+        flag_good = True
+
+    if flag_good == False:
+        return None
+
     file_path = os.path.join(path, datafile)
     
     #print("loading file " + file_path)
@@ -28,8 +40,8 @@ def load_image(datafile, path = "", flag_bw_load = False):
         try:
             img = load_img(file_path)  # this is a PIL image
           
-        except:
-            print("error trying to load")
+        except Exception as e:
+            print(e)
             return None
 
     x = img_to_array(img)  # this is a Numpy array with shape (3, 150, 150)
@@ -63,7 +75,7 @@ def load_data(datafile, path = ''):
     return pd.read_csv(csv_path, encoding='latin-1')
 
 #get list of files in a directory
-def get_file_list(path = "", ext = "jpg", flag_include_path = False):
+def get_file_list(path = "", ext = ["jpg", "png"], flag_include_path = False):
 
     flag_include_path = False
     file_list = []
@@ -72,6 +84,19 @@ def get_file_list(path = "", ext = "jpg", flag_include_path = False):
             file_list = file_list + files
         else:            
             file_list = file_list + str(os.path.join(path, files))
+        # break out you only want root directory not sub directories
+        break
+
+    # using naive method  
+    # to remove None values in list 
+    res = [] 
+    for val in file_list:
+        for my_ext in ext: 
+            if (("." + my_ext) in val):
+                res.append(val) 
+                break
+
+    file_list = res
 
     return file_list
 
