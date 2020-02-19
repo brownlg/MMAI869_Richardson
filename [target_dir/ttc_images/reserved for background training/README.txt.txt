@@ -1,0 +1,1 @@
+Photo in this directory are used to train the background of TTC, and are not included in image classifier training, validation or test

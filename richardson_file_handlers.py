@@ -12,7 +12,19 @@ from keras.preprocessing.image import save_img
 
 
 #load image
-def load_image(datafile, path = "", flag_bw_load = False):    
+def load_image(datafile, path = "", flag_bw_load = False):  
+    dummy, file_extension = os.path.splitext(datafile)
+
+    flag_good = False
+    if file_extension == '.png':
+        flag_good = True
+    
+    if file_extension == '.jpg':
+        flag_good = True
+
+    if flag_good == False:
+        return None
+
     file_path = os.path.join(path, datafile)
     
     #print("loading file " + file_path)
@@ -27,8 +39,9 @@ def load_image(datafile, path = "", flag_bw_load = False):
         
         try:
             img = load_img(file_path)  # this is a PIL image
-        except:
-            print("error trying to load")
+          
+        except Exception as e:
+            print(e)
             return None
 
     x = img_to_array(img)  # this is a Numpy array with shape (3, 150, 150)
@@ -62,15 +75,32 @@ def load_data(datafile, path = ''):
     return pd.read_csv(csv_path, encoding='latin-1')
 
 #get list of files in a directory
-def get_file_list(path = "", ext = "jpg"):
+def get_file_list(path = "", ext = ["jpg", "png"], flag_include_path = False):
 
+    flag_include_path = False
     file_list = []
     for root, dirs, files in os.walk(path):
-        file_list = file_list + files
+        if flag_include_path == False:
+            file_list = file_list + files
+        else:            
+            file_list = file_list + str(os.path.join(path, files))
+        # break out you only want root directory not sub directories
+        break
+
+    # using naive method  
+    # to remove None values in list 
+    res = [] 
+    for val in file_list:
+        for my_ext in ext: 
+            if (("." + my_ext) in val):
+                res.append(val) 
+                break
+
+    file_list = res
 
     return file_list
 
-def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, window_x=10, window_y=10, num_channels = 1):
+def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, window_x=10, window_y=10, num_channels = 1, scale = False):
     file_list = []
     
     for root, dirs, files in os.walk(file_path):
@@ -82,7 +112,7 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
     # to remove None values in list 
     res = [] 
     for val in file_list: 
-        if val is not None : 
+        if (val is not None) and (".txt" not in val):
             res.append(val) 
 
     file_list = res
@@ -97,14 +127,18 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
 
     cc=0
     for file_name in file_list:
-        # open the file add to array
-        img = load_image(file_name, file_path, True)  # this is a PIL image
-      
-        img_arr[cc] = img[0]
+        # open the file add to array    
+        img = load_image(file_name, file_path, False)  # this is a PIL image
+
+        if scale == True:
+            img = cv2.resize(img[0], dsize=(int(window_x), int(window_y)), interpolation=cv2.INTER_CUBIC)
+            img_arr[cc] = img
+        else:
+            img_arr[cc] = img[0]
 
         cc = cc + 1
-        if (cc >= max_limit):
+        if (cc >= number_of_files):
             break
 
-    return img_arr, file_list
+    return img_arr, file_list[:number_of_files]
 

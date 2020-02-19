@@ -8,6 +8,8 @@ __pycache__/richardson_image_handlers.cpython-36.pyc
 data.csv*
 *.png
 *.h5
+*.npy
+*.mp4
 
 richardson_info_files/data.csv
 richardson_info_files/data.csv
