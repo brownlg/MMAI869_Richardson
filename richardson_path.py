@@ -1,6 +1,6 @@
 #setup paths
-DATA_PATH = "[target_dir\\validation]\\" 
-META_PATH = "[target_dir\\validation]\\Validation Meta data"
+DATA_PATH = "[target_dir/validation]/" 
+META_PATH = "[target_dir/validation]/Validation Meta data"
 META_FILE = "validation-annotations-bbox.csv"
 
 TRAIN_PATH = 'richardson_images_train_set'
@@ -20,5 +20,5 @@ human_labels = {
 	}
 
 #dimensions of input image
-WINDOW_X = 20
-WINDOW_Y = 60
+WINDOW_X = 80
+WINDOW_Y = 80

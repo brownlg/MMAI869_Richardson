@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 max_images = 3500000
 
 print("Loading dictionary for y_train...")
-my_logger = r_logger.R_logger(my_paths.INFO_PATH + '\\' + "data.csv")
+my_logger = r_logger.R_logger(my_paths.INFO_PATH + '/' + "data.csv")
 my_y_values = my_logger.load_dictionary()
 
 print("Loading images for train...")
@@ -91,10 +91,10 @@ model.compile(optimizer='adam',
 #              metrics=['mse'])
 
 
-model.fit(x=x_train, y=y_train, batch_size = 400, epochs = 5)
+model.fit(x=x_train, y=y_train, batch_size = 20, epochs = 5)
 
-print(model.evaluate(x_test, y_test))
-print(model.metrics_names)
+#print(model.evaluate(x_test, y_test))
+#print(model.metrics_names)
 
 model.save('my_classifier_soft_max_2.h5')
 

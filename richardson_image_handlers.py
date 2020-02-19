@@ -31,8 +31,8 @@ def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
     y_min = 0
     x_max = x_min + window_x
     y_max = y_min + window_y
-    step_x = 3
-    step_y = 3
+    step_x = 30
+    step_y = 30
     steps_x =  int((img_width - window_x) /step_x)
     steps_y = int((img_height - window_y) / step_y)
 
@@ -197,7 +197,7 @@ def process_image_for_window(my_img, window_x, window_y):
     img_clipped = zoom_to_fit_box(window_x, window_y, my_img)
     img_background = np.copy(img_clipped)
 
-    img_height, img_width, img__color = img_clipped.shape
+    img_height, img_width, img_color = img_clipped.shape
 
     # validate dimensions
     if ((img_width == 0) or (img_height ==0)):
