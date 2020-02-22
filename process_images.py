@@ -17,18 +17,15 @@ import os
 
 TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 
-IMG_WINDOW_X = 80
-IMG_WINDOW_Y = 80
+IMG_WINDOW_X = 128
+IMG_WINDOW_Y = 128
 
 COLLECT_MAX = 50  #select how many images you want total
-
-DEFN_FILE = "mySettings.csv"
 
 #get list of images to load, based on jpg in file directory
 #img_list = get_file_list(DATA_PATH)
 
 #get list of images with human labels first
-COLLECT_MAX = 20000   #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
 
@@ -88,7 +85,7 @@ for img_id in img_list:
 	#print(target_rows)
 	clipped_images = richardson_image_handlers.create_clipped_images(img_id, richardson_path.DATA_PATH, target_rows, IMG_WINDOW_X, IMG_WINDOW_Y)
 
-	flag_TTC = True
+	flag_TTC = False
 	if flag_TTC is True:
 		ttc_background_images = richardson_image_handlers.create_clipped_images("Photo from Luke(2) - use for TTC background.jpg", "", None, IMG_WINDOW_X, IMG_WINDOW_Y)
 
