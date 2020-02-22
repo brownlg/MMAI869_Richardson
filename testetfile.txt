@@ -1,0 +1,9 @@
+ Volume in drive D is Backup drive slow
+ Volume Serial Number is A0ED-CA38
+
+ Directory of D:\userdata\90 - Projects\11 - code\attempt3\MMAI869_Richardson\richardson_images_test_set
+
+12/30/2019  06:04 PM    <DIR>          .
+12/30/2019  06:04 PM    <DIR>          ..
+               0 File(s)              0 bytes
+               2 Dir(s)  822,067,552,256 bytes free
