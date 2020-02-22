@@ -81,8 +81,8 @@ model.compile(optimizer='adam',
 
 model.fit(x=x_train, y=y_train, batch_size = 100, epochs = 20)
 
-print(model.evaluate(x_test, y_test))
-print(model.metrics_names)
+#print(model.evaluate(x_test, y_test))
+#print(model.metrics_names)
 
 print("Saving model...")
 model.save('my_classifier_soft_max_2.h5')

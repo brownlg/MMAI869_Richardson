@@ -3,10 +3,10 @@
 # classifier will use 200 x 200 pixel input
 
 #Setup global options
-
 import pandas as pd
 import numpy as np
 from random import random
+
 
 import richardson_image_handlers
 from richardson_file_handlers import load_data, save_image, get_file_list
@@ -20,6 +20,14 @@ TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 IMG_WINDOW_X = 80
 IMG_WINDOW_Y = 80
 
+COLLECT_MAX = 50  #select how many images you want total
+
+DEFN_FILE = "mySettings.csv"
+
+#get list of images to load, based on jpg in file directory
+#img_list = get_file_list(DATA_PATH)
+
+#get list of images with human labels first
 COLLECT_MAX = 20000   #select how many images you want total
 
 DEFN_FILE = "mySettings.csv"
@@ -58,7 +66,7 @@ for label_name in richardson_path.human_labels:
 #img_id = "00a159a661a2f5aa"
 
 from Richardson_Logger import r_logger
-my_logger = r_logger.R_logger(richardson_path.INFO_PATH + '\\' + "data.csv")
+my_logger = r_logger.R_logger(richardson_path.INFO_PATH + '/' + "data.csv")
 my_logger.clear()
 my_logger.write_line("tvt,flag_person,imgid\n")
 

@@ -28,10 +28,10 @@ def load_image(datafile, path = "", flag_bw_load = False):
     file_path = os.path.join(path, datafile)
     
     #print("loading file " + file_path)
-
-    if (flag_bw_load):        
+    if (flag_bw_load):       
         try:
             img = load_img(file_path, True)  # this is a PIL image
+            print("")
         except:
             print("error trying to load")
             return None

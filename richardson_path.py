@@ -33,5 +33,5 @@ human_labels = {
 	}
 
 #dimensions of input image
-WINDOW_X = 20
-WINDOW_Y = 60
+WINDOW_X = 80
+WINDOW_Y = 80
