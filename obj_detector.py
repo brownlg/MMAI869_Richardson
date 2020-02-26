@@ -6,6 +6,7 @@ import os
 import json as json
 import bbox
 from bbox.metrics import jaccard_index_2d
+import numpy as np
 
 from Richardson_Logger import r_logger
 
@@ -18,7 +19,7 @@ from keras.models import load_model
 #my_model = load_model("my_classifier_soft_max_2.h5") # works on faces, 1st one that actually seemed to work
 #my_model = load_model("my_classifier_soft_max_2.h5") 
 my_model = load_model("path_1_richardson_V1.h5") 
-print("done")
+print("Completed loading model")
 
 with open(os.path.join('path_1_models', 'annotations', 'via_region_data.json')) as json_file:
     data = json.load(json_file)
@@ -39,33 +40,45 @@ def get_bounding_box(meta_data, filename):
                 boxes.append([x, y, x + width, y + height])            
     return boxes
 
+def add_arr(target, source, index):
+    for it in source:
+        target[index] = it
+        index = index + 1    
+    return target, index
 
-my_model.summary()
-meta_data = data.get('_via_img_metadata')
-files = file_handler.get_file_list(my_paths.TTC_PATH)
+def add_list(target, source):
+    # using naive method to concat 
+    for it in source : 
+        target.append(it) 
+    return target
 
-my_logger = r_logger.R_logger(os.path.join("richardson_info_files", "obj_mAP_values.csv"))
-my_logger.clear()
-my_logger.write_line("imageid, boundingbox_id, IOU, sourceimage\n")
-
-img_index=0
-for file_to_scan in files:
-    #get ground truth bounding box from JSON
-    true_bounding_boxes = get_bounding_box(meta_data, file_to_scan)
-
-    my_image = file_handler.load_image(file_to_scan, path=my_paths.TTC_PATH, flag_bw_load=False)[0]
-
+def process_image(my_image, img_index, my_logger, true_bounding_boxes):
     #reate grid z-level 0
-    img_arr, list_of_boxes = img_handler.get_grid(my_image, 1, WINDOW_X, WINDOW_Y, 3)
+    img_arr1, list_of_boxes1 = img_handler.get_grid(my_image, 0.85, WINDOW_X, WINDOW_Y, 3)
+    img_arr2, list_of_boxes2 = img_handler.get_grid(my_image, 1.25, WINDOW_X, WINDOW_Y, 3)
+    img_arr3, list_of_boxes3 = img_handler.get_grid(my_image, 0.75, WINDOW_X, WINDOW_Y, 3)
+
+    number_of_clips = img_arr1.shape[0] + img_arr2.shape[0] + img_arr3.shape[0]
+    num_channels = 3
+
+    img_arr = np.empty((number_of_clips, WINDOW_Y, WINDOW_X, num_channels), dtype=int)
+    img_arr, index = add_arr(img_arr, img_arr1, 0)
+    img_arr, index = add_arr(img_arr, img_arr2, index)
+    img_arr, index = add_arr(img_arr, img_arr3, index)
     img_arr = img_arr / 255
 
+    list_of_boxes = []
+
+    # using naive method to concat 
+    list_of_boxes = add_list(list_of_boxes, list_of_boxes1)
+    list_of_boxes = add_list(list_of_boxes, list_of_boxes2)
+    list_of_boxes = add_list(list_of_boxes, list_of_boxes3)
+
     results = my_model.predict(img_arr)
-    #probability_true  = my_model.prediction[:,1]
-    #print(probability_true)
-    print("done")
+    print("Prediction completed for image using grid clips")
 
     #filter for results that meet threshold for the object detector
-    detector_threshold = 0.9999
+    detector_threshold = 0.9
     results_true = []
     for index in range(0, len(results)):
         result = results[index]
@@ -154,4 +167,26 @@ for file_to_scan in files:
         
     #save image with bounding boxes to output folder       
     file_handler.save_image('obj_detected' + str(img_index) +'.png', path = my_paths.OBJ_TEST_RESULTS, image_data = my_image, flag_png = True, remove_color = False)
+   
+    return
+
+
+
+my_model.summary()
+meta_data = data.get('_via_img_metadata')
+files = file_handler.get_file_list(my_paths.TTC_PATH)
+
+my_logger = r_logger.R_logger(os.path.join("richardson_info_files", "obj_mAP_values.csv"))
+my_logger.clear()
+my_logger.write_line("imageid, boundingbox_id, IOU, sourceimage\n")
+
+img_index=0
+for file_to_scan in files:
+    #get ground truth bounding box from JSON
+    true_bounding_boxes = get_bounding_box(meta_data, file_to_scan)
+    my_image = file_handler.load_image(file_to_scan, path=my_paths.TTC_PATH, flag_bw_load=False)[0]
+    process_image(my_image, img_index, my_logger, true_bounding_boxes)
     img_index = img_index + 1
+
+
+  

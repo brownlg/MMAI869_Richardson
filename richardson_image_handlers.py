@@ -31,16 +31,17 @@ def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
     #create list of boxes check
     x_min = 0
     y_min = 0
-    x_max = x_min + window_x
-    y_max = y_min + window_y
-    step_x = 30
-    step_y = 30
-    steps_x =  int((img_width - window_x) /step_x)
-    steps_y = int((img_height - window_y) / step_y)
+    x_max = x_min + window_x * zoom_level
+    y_max = y_min + window_y * zoom_level
+    step_x = 30 * zoom_level
+    step_y = 30 * zoom_level
+    steps_x =  int((img_width - window_x * zoom_level) /step_x)
+    steps_y = int((img_height - window_y * zoom_level) / step_y)
 
     if (steps_x == 0) and (steps_y == 0):
         img_clipped = my_image[y_min : y_max, 
                                x_min : x_max, :]
+        img_clipped = cv2.resize(img_clipped, dsize=(int(window_x), int(window_y)), interpolation= cv2.INTER_CUBIC)
         img_arr[0] = img_clipped
         list_of_boxes.append((int(x_min), int(y_min), int(x_max), int(y_max)))     
         return img_arr, list_of_boxes
@@ -53,12 +54,12 @@ def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
         for x in range(0, steps_x):      
             list_of_boxes.append((int(x_min), int(y_min), int(x_max), int(y_max)))        
             x_min = x_min + step_x       
-            x_max = x_min + window_x
+            x_max = x_min + window_x * zoom_level
         
         x_min = 0
-        x_max = x_min + window_x       
+        x_max = x_min + window_x * zoom_level    
         y_min = y_min + step_y
-        y_max = y_min + window_y
+        y_max = y_min + window_y * zoom_level
    
     for box in list_of_boxes:
         img_clipped = my_image[box[1] : box[3], 
@@ -66,10 +67,8 @@ def get_grid(my_image, zoom_level, window_x, window_y, num_channels):
 
         clip_height, clip_width, img_color = img_clipped.shape
 
-        #zoom to fit box
-        zoom_x = float(window_x) / float(clip_width)
-        zoom_y = float(window_y) / float(clip_height)                
-      #  img_clipped = cv2.resize(img_clipped, dsize=(int(zoom_x * img_width), int(zoom_y * img_height)), interpolation= cv.INTER_CUBIC)
+        #zoom to fit box               
+        img_clipped = cv2.resize(img_clipped, dsize=(int(window_x), int(window_y)), interpolation= cv2.INTER_CUBIC)
 
         #save image for processing
         img_arr[cc] = img_clipped
