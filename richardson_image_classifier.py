@@ -85,7 +85,7 @@ model.fit(x=x_train, y=y_train, batch_size = 100, epochs = 20)
 #print(model.metrics_names)
 
 print("Saving model...")
-model.save('my_classifier_soft_max_2.h5')
+model.save('path_1_richardson_V1.h5')
 
 print("deleting old file 1")
 if os.path.exists(os.path.join("trained_model_results", "test_results_summary.csv")):

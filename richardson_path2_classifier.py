@@ -74,7 +74,6 @@ x=base_model.output
 
 
 #Include a few dense layers and an output layer with softmax and two outputs (human head or no human head)
-
 x=GlobalAveragePooling2D()(x)
 x=Dense(1024,activation='relu')(x) 
 x=Dense(1024,activation='relu')(x)

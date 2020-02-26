@@ -7,15 +7,17 @@ import json as json
 import bbox
 from bbox.metrics import jaccard_index_2d
 
+from Richardson_Logger import r_logger
+
 #dimensions of input image
-WINDOW_X = 128
-WINDOW_Y = 128
+WINDOW_X = 80
+WINDOW_Y = 80
 
 # load the trained neural network
 from keras.models import load_model
 #my_model = load_model("my_classifier_soft_max_2.h5") # works on faces, 1st one that actually seemed to work
 #my_model = load_model("my_classifier_soft_max_2.h5") 
-my_model = load_model("stream2_lb_classifier.h5") 
+my_model = load_model("path_1_richardson_V1.h5") 
 print("done")
 
 with open(os.path.join('path_1_models', 'annotations', 'via_region_data.json')) as json_file:
@@ -42,6 +44,10 @@ my_model.summary()
 meta_data = data.get('_via_img_metadata')
 files = file_handler.get_file_list(my_paths.TTC_PATH)
 
+my_logger = r_logger.R_logger(os.path.join("richardson_info_files", "obj_mAP_values.csv"))
+my_logger.clear()
+my_logger.write_line("imageid, boundingbox_id, IOU\n")
+
 img_index=0
 for file_to_scan in files:
     #get ground truth bounding box from JSON
@@ -60,8 +66,9 @@ for file_to_scan in files:
 
     # draw the boxes on the image    
     cc = 0 
+    ious = []   
     for result in results:    
-        if (result[1] == 1.0):
+        if (result[1] > 0.9999):
             #person found, draw the box
             box = list_of_boxes[cc]
             #draw rectangle
