@@ -46,7 +46,7 @@ files = file_handler.get_file_list(my_paths.TTC_PATH)
 
 my_logger = r_logger.R_logger(os.path.join("richardson_info_files", "obj_mAP_values.csv"))
 my_logger.clear()
-my_logger.write_line("imageid, boundingbox_id, IOU\n")
+my_logger.write_line("imageid, boundingbox_id, IOU, sourceimage\n")
 
 img_index=0
 for file_to_scan in files:
@@ -64,26 +64,65 @@ for file_to_scan in files:
     #print(probability_true)
     print("done")
 
-    # draw the boxes on the image    
-    cc = 0 
-    ious = []   
-    for result in results:    
-        if (result[1] > 0.9999):
-            #person found, draw the box
-            box = list_of_boxes[cc]
-            #draw rectangle
-            cv2.rectangle(my_image, (box[0], box[1]), 
-                                    (box[2], box[3]), (255, 255, 255), 3)
+    #filter for results that meet threshold for the object detector
+    detector_threshold = 0.9999
+    results_true = []
+    for index in range(0, len(results)):
+        result = results[index]
+        if (result[1] > detector_threshold):
+            results_true.append([index, result[1], True])
+   
+    # (!) you need to check to see if this result overlaps with previous one, if so does it have higher prediction on the class, if so then you should remove the other prediction and replace with this one
+    for index_1 in range(0, len(results_true)):
+        box_1 = list_of_boxes[results_true[index_1][0]]
+        predict_box_1 = bbox.BBox2D([box_1[0], box_1[1], box_1[2], box_1[3]], mode=1)
 
-            # calculate area of overlap
-            ious = []
-            for true_bounding_box in true_bounding_boxes:
-                predict_box = bbox.BBox2D([box[0], box[1], box[2], box[3]])                
-                true_box = bbox.BBox2D(true_bounding_box)
-                iou = jaccard_index_2d(predict_box, true_box)
-                ious.append(iou)
-            
-        cc = cc + 1
+        for index_2 in range(0, len(results_true)):
+            if (index_1 == index_2): # dont compare itself
+                continue
+            # get the bounding box corresponding to this one
+            box_2 = list_of_boxes[results_true[index_2][0]]            
+            predict_box_2 = bbox.BBox2D([box_2[0], box_2[1], box_2[2], box_2[3]], mode=1)
+
+            # do these boxes overlap?
+            iou = jaccard_index_2d(predict_box_1, predict_box_2)            
+            if (iou > 0.1):
+                # is Box 1 beat?
+                box_1_value = results_true[index_1][1]
+                box_2_value = results_true[index_2][1]
+                
+                if (box_2_value > box_1_value):
+                    #flag box one as no good
+                    results_true[index_1][2] = False
+
+    #now remove all entries where = False
+    results_final = []
+    for index in range(0, len(results_true)):
+        if results_true[index][2] == True:
+            results_final.append(results_true[index])
+
+    # draw the boxes on the image    
+    ious = []   
+    for index in range(0, len(results_final)):          
+        #person found, draw the box
+        box = list_of_boxes[results_final[index][0]]  # 0 = index of the box
+        #draw rectangle
+        cv2.rectangle(my_image, (box[0], box[1]), 
+                                (box[2], box[3]), (255, 255, 255), 3)
+
+        # calculate area of overlap
+        ious = []
+        max_iou = 0.0
+        for true_bounding_box in true_bounding_boxes:
+            predict_box = bbox.BBox2D([box[0], box[1], box[2], box[3]], mode=1)                
+            true_box = bbox.BBox2D(true_bounding_box,mode=1)
+            iou = jaccard_index_2d(predict_box, true_box)
+            ious.append(iou)
+            max_iou = max(iou, max_iou)
+
+        # record the iou
+        my_logger.write_line(str(img_index) + "," + str(results_final[index][0])+ "," + str(max_iou) + "," + file_to_scan + "\n")
+       
     
     # calculate the average iou
     sum_iou = 0
@@ -116,7 +155,3 @@ for file_to_scan in files:
     #save image with bounding boxes to output folder       
     file_handler.save_image('obj_detected' + str(img_index) +'.png', path = my_paths.OBJ_TEST_RESULTS, image_data = my_image, flag_png = True, remove_color = False)
     img_index = img_index + 1
-
-
-
-
