@@ -586,12 +586,22 @@ def cut_out_target(target_label, selected_rows):
     for it in target_label:
         #print(it + " >> " + select_rows.LabelName)
         # human_row = selected_rows.loc([selected_rows.LabelName == it) & (selected_rows.IsDepiction == 0)]
-        human_row = selected_rows[(selected_rows['LabelName'] == it) & (selected_rows['IsDepiction'] == 0)]
-        #print(human_row.head())
-        if (len(my_rows.index) == 0):
-            my_rows = human_row
-        else:
-            my_rows.append(human_row)
+        for row in selected_rows:
+            flag_good = True
+
+            if row['LabelName'] != it:
+                continue
+            
+            if row['IsDepiction'] == 1:
+                continue
+
+            if row['IsGroupOf'] == 1:
+                continue
+        
+            if (len(my_rows.index) == 0):
+                my_rows = row
+            else:
+                my_rows.append(row)
 
     if (DEBUG_MODE):
         print("\n")

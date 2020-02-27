@@ -11,13 +11,13 @@ import numpy as np
 from Richardson_Logger import r_logger
 
 #dimensions of input image
-WINDOW_X = 80
-WINDOW_Y = 80
+WINDOW_X = 128
+WINDOW_Y = 128
 
 # load the trained neural network
 from keras.models import load_model
-my_model = load_model("path_1_richardson_V1.h5") 
-#my_model = load_model("stream2_lb_classifier.h5") 
+#my_model = load_model("path_1_richardson_V1.h5") 
+my_model = load_model("stream2_lb_classifier.h5") 
 print("Completed loading model")
 
 with open(os.path.join('path_1_models', 'annotations', 'via_region_data.json')) as json_file:
@@ -53,10 +53,14 @@ def add_list(target, source):
 
 def process_image(my_image, img_index, my_logger, true_bounding_boxes):
     #reate grid z-level 0
-    img_arr1, list_of_boxes1 = img_handler.get_grid(my_image, 0.64, WINDOW_X, WINDOW_Y, 3)     # 51 pixel
-    img_arr2, list_of_boxes2 = img_handler.get_grid(my_image, 1.6, WINDOW_X, WINDOW_Y, 3)     # 128 px
-    img_arr3, list_of_boxes3 = img_handler.get_grid(my_image, 1.2, WINDOW_X, WINDOW_Y, 3)     # 96 pixel
+    img_arr1, list_of_boxes1 = img_handler.get_grid(my_image, 0.4, WINDOW_X, WINDOW_Y, 3)     # 51 pixel
+    img_arr2, list_of_boxes2 = img_handler.get_grid(my_image, 1.0, WINDOW_X, WINDOW_Y, 3)     # 128 px
+    img_arr3, list_of_boxes3 = img_handler.get_grid(my_image, 0.75, WINDOW_X, WINDOW_Y, 3)     # 96 pixel
 
+    ##img_arr1, list_of_boxes1 = img_handler.get_grid(my_image, 0.6375 , WINDOW_X, WINDOW_Y, 3)     # 51 pixel
+    #img_arr2, list_of_boxes2 = img_handler.get_grid(my_image, 1.6, WINDOW_X, WINDOW_Y, 3)     # 128 px
+    #img_arr3, list_of_boxes3 = img_handler.get_grid(my_image, 0.9, WINDOW_X, WINDOW_Y, 3)     # 96 pixel
+    
     number_of_clips = img_arr1.shape[0] + img_arr2.shape[0] + img_arr3.shape[0]
     num_channels = 3
 
@@ -77,7 +81,7 @@ def process_image(my_image, img_index, my_logger, true_bounding_boxes):
     print("Prediction completed for image using grid clips")
 
     #filter for results that meet threshold for the object detector
-    detector_threshold = 0.99999
+    detector_threshold = 0.9999
     results_true = []
     for index in range(0, len(results)):
         result = results[index]
@@ -117,6 +121,7 @@ def process_image(my_image, img_index, my_logger, true_bounding_boxes):
 
     # draw the boxes on the image    
     ious = []   
+    true_box_iou = [-1.0 for i in range(len(true_bounding_boxes))]
     for index in range(0, len(results_final)):          
         #person found, draw the box
         box = list_of_boxes[results_final[index][0]]  # 0 = index of the box
@@ -127,16 +132,26 @@ def process_image(my_image, img_index, my_logger, true_bounding_boxes):
         # calculate area of overlap
         ious = []
         max_iou = 0.0
-        for true_bounding_box in true_bounding_boxes:
+        for q in range(0, len(true_bounding_boxes)):
+            true_bounding_box = true_bounding_boxes[q]
             predict_box = bbox.BBox2D([box[0], box[1], box[2], box[3]], mode=1)                
             true_box = bbox.BBox2D(true_bounding_box,mode=1)
             iou = jaccard_index_2d(predict_box, true_box)
             ious.append(iou)
             max_iou = max(iou, max_iou)
+            true_box_iou[q] = max(true_box_iou[q], iou)
 
         # record the iou
         my_logger.write_line(str(img_index) + "," + str(results_final[index][0])+ "," + str(max_iou) + "," + file_to_scan + "\n")
-       
+
+    # record any 0 iou left over on true_boxes, i.e. false negative
+    for q in range(0, len(true_bounding_boxes)):
+        if true_box_iou[q] <= 0:
+            my_logger.write_line(str(img_index) + "," + str(-1)+ "," + str(true_box_iou[q]) + "," + file_to_scan + "\n")
+
+    # calculate false negatives
+    # that each bounding box to see if it has been identified as a head
+     
     
     # calculate the average iou
     sum_iou = 0

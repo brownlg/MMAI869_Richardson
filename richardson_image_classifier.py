@@ -4,6 +4,7 @@ import tensorflow as tf
 import numpy as np
 import pandas as pd
 import os
+
 #get paths for files
 import richardson_path as my_paths
 import richardson_file_handlers as file_handler
@@ -15,7 +16,8 @@ WINDOW_X = 80
 WINDOW_Y = 80
 
 from keras import backend as K
-#print(K.tensorflow_backend._get_available_gpus())
+print(K.tensorflow_backend._get_available_gpus())
+
 import matplotlib.pyplot as plt
 
 max_images = 20000
@@ -26,7 +28,6 @@ my_logger = r_logger.R_logger(os.path.join(my_paths.INFO_PATH, "data.csv"))
 my_y_values = my_logger.load_dictionary()
 
 print("Loading images for train...")
-#(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 x_train, x_train_files = file_handler.load_images_for_keras(my_paths.TRAIN_PATH, "png", max_images, WINDOW_X, WINDOW_Y, num_channels=3)
 x_train = x_train / 255
 
@@ -38,16 +39,6 @@ print('x_train shape:', x_train.shape)
 print('Number of images in x_train', x_train.shape[0])
 print('Number of images in x_test', x_test.shape[0])
 
-#image_index = 7777 # You may select anything up to 60,000
-#print(y_train[image_index]) # The label is 8
-#plt.imshow(x_train[image_index], cmap='Greys')
-
-# Reshaping the array to 4-dims so that it can work with the Keras API
-#x_train = x_train.reshape(x_train.shape[0], WINDOW_X, WINDOW_Y, 1)
-#x_test = x_test.reshape(x_test.shape[0], WINDOW_X, WINDOW_Y, 1)
-
-
-
 print("Get y values...")
 y_train = image_handler.get_y_value(x_train_files, my_y_values, my_paths.human_labels)
 y_test = image_handler.get_y_value(x_test_files, my_y_values, my_paths.human_labels)
@@ -55,7 +46,6 @@ y_test = image_handler.get_y_value(x_test_files, my_y_values, my_paths.human_lab
 #create y_train and y_test values
 print('Number of images in y_train', y_train.shape[0])
 print('Number of images in y_test', y_test.shape[0])
-
 
 # Importing the required Keras modules containing model and layers
 from keras.models import Sequential
@@ -85,7 +75,7 @@ model.fit(x=x_train, y=y_train, batch_size = 100, epochs = 20)
 #print(model.metrics_names)
 
 print("Saving model...")
-model.save('path_1_richardson_V1.h5')
+model.save('path_1_richardson_V2.h5')
 
 print("deleting old file 1")
 if os.path.exists(os.path.join("trained_model_results", "test_results_summary.csv")):

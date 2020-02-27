@@ -76,24 +76,25 @@ def load_data(datafile, path = ''):
 
 #get list of files in a directory
 def get_file_list(path = "", ext = ["jpg", "png"], flag_include_path = False):
-
-    flag_include_path = False
-    file_list = []
+    
     for root, dirs, files in os.walk(path):
-        if flag_include_path == False:
-            file_list = file_list + files
-        else:            
-            file_list = file_list + str(os.path.join(path, files))
-        # break out you only want root directory not sub directories
         break
 
+    file_list = []
+    for file in files:
+        if flag_include_path == False:
+            file_list = file_list + [file]
+        else:            
+            file_list = file_list + [str(os.path.join(path, file))]
+        # break out you only want root directory not sub directories
+        
     # using naive method  
     # to remove None values in list 
     res = [] 
-    for val in file_list:
+    for file_name in file_list:
         for my_ext in ext: 
-            if (("." + my_ext) in val):
-                res.append(val) 
+            if (my_ext) == file_name[-3:]:
+                res.append(file_name) 
                 break
 
     file_list = res

@@ -46,7 +46,7 @@ def load_image(image_path):
     #img = tf.keras.applications.inception_v3.preprocess_input(img)
     return img, image_path
 
-image_file_names = file_handler.get_file_list("simple_gen_images", "jpg", True)
+image_file_names = file_handler.get_file_list("simple_gen_images", ["jpg"], flag_include_path=True)
 
 # Get unique images
 encode_train = sorted(set(image_file_names))
@@ -65,7 +65,7 @@ for img, path in image_dataset:
     np.save(path_of_feature, bf.numpy())
 
 
-shuffle_image, shuffle_image_file_names = shuffle(images, image_file_names, random_state=42)
+shuffle_image, shuffle_image_file_names = shuffle(image_dataset, image_file_names, random_state=42)
 
 image_count = len(shuffle_image_file_names)
 train_count = int(image_count * 0.8)
