@@ -16,9 +16,8 @@ WINDOW_Y = 80
 
 # load the trained neural network
 from keras.models import load_model
-#my_model = load_model("my_classifier_soft_max_2.h5") # works on faces, 1st one that actually seemed to work
-#my_model = load_model("my_classifier_soft_max_2.h5") 
 my_model = load_model("path_1_richardson_V1.h5") 
+#my_model = load_model("stream2_lb_classifier.h5") 
 print("Completed loading model")
 
 with open(os.path.join('path_1_models', 'annotations', 'via_region_data.json')) as json_file:
@@ -54,9 +53,9 @@ def add_list(target, source):
 
 def process_image(my_image, img_index, my_logger, true_bounding_boxes):
     #reate grid z-level 0
-    img_arr1, list_of_boxes1 = img_handler.get_grid(my_image, 0.85, WINDOW_X, WINDOW_Y, 3)
-    img_arr2, list_of_boxes2 = img_handler.get_grid(my_image, 1.25, WINDOW_X, WINDOW_Y, 3)
-    img_arr3, list_of_boxes3 = img_handler.get_grid(my_image, 0.75, WINDOW_X, WINDOW_Y, 3)
+    img_arr1, list_of_boxes1 = img_handler.get_grid(my_image, 0.64, WINDOW_X, WINDOW_Y, 3)     # 51 pixel
+    img_arr2, list_of_boxes2 = img_handler.get_grid(my_image, 1.6, WINDOW_X, WINDOW_Y, 3)     # 128 px
+    img_arr3, list_of_boxes3 = img_handler.get_grid(my_image, 1.2, WINDOW_X, WINDOW_Y, 3)     # 96 pixel
 
     number_of_clips = img_arr1.shape[0] + img_arr2.shape[0] + img_arr3.shape[0]
     num_channels = 3
@@ -78,7 +77,7 @@ def process_image(my_image, img_index, my_logger, true_bounding_boxes):
     print("Prediction completed for image using grid clips")
 
     #filter for results that meet threshold for the object detector
-    detector_threshold = 0.9
+    detector_threshold = 0.99999
     results_true = []
     for index in range(0, len(results)):
         result = results[index]
@@ -104,10 +103,12 @@ def process_image(my_image, img_index, my_logger, true_bounding_boxes):
                 box_1_value = results_true[index_1][1]
                 box_2_value = results_true[index_2][1]
                 
-                if (box_2_value > box_1_value):
+                if (box_2_value >= box_1_value):
                     #flag box one as no good
                     results_true[index_1][2] = False
-
+                    #bump up box_2 value a little bit
+                    results_true[index_2][1] = results_true[index_2][1] * 1.00001
+              
     #now remove all entries where = False
     results_final = []
     for index in range(0, len(results_true)):
