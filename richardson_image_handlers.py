@@ -199,14 +199,14 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
         print("Image width: "+  str(width))
 
     # get background factor
-    back_factor = 1.25
+    back_factor = 0.25
 
     # first add the target images
     clipped_images = [] #list    
     for index, row in target_rows.iterrows():  
         # calculate the bounds with the window size
-        my_clip_width = int(width * row['XMax'] * back_factor) - int(width * row['XMin'] * back_factor) 
-        my_clip_height = int(height * row['YMax'] * back_factor) - int(height * row['YMin'] * back_factor)
+        my_clip_width = int(width * row['XMax']) - int(width * row['XMin']) 
+        my_clip_height = int(height * row['YMax']) - int(height * row['YMin'])
 
         # calculate which pixels you need to pad in the zoom out view
         padding_x, padding_y = get_padding(window_x, window_y, my_clip_width, my_clip_height)
@@ -217,6 +217,13 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
 
         pixel_start_y = int(height * row['YMin']) - padding_y 
         pixel_end_y = int(height * row['YMax']) + padding_y
+
+        # adjust pixel start and end to capture more or less of background
+        pixel_start_x = int(pixel_start_x - (my_clip_width * back_factor))
+        pixel_end_x   = int(pixel_end_x + (my_clip_width * back_factor))
+
+        pixel_start_y = int(pixel_start_y - (my_clip_height * back_factor))
+        pixel_end_y   = int(pixel_end_y + (my_clip_height * back_factor))
 
         # make sure in bounds
         pixel_start_x = max(pixel_start_x, 0)
