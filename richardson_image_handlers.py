@@ -198,12 +198,15 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
         print("Image height: " + str(height))
         print("Image width: "+  str(width))
 
+    # get background factor
+    back_factor = 1.25
+
     # first add the target images
     clipped_images = [] #list    
     for index, row in target_rows.iterrows():  
         # calculate the bounds with the window size
-        my_clip_width = int(width * row['XMax']) - int(width * row['XMin']) 
-        my_clip_height = int(height * row['YMax']) - int(height * row['YMin'])
+        my_clip_width = int(width * row['XMax'] * back_factor) - int(width * row['XMin'] * back_factor) 
+        my_clip_height = int(height * row['YMax'] * back_factor) - int(height * row['YMin'] * back_factor)
 
         # calculate which pixels you need to pad in the zoom out view
         padding_x, padding_y = get_padding(window_x, window_y, my_clip_width, my_clip_height)
@@ -581,27 +584,24 @@ def create_caption(image, boxes, class_definitions):
 
 def cut_out_target(target_label, selected_rows):
     my_rows = pd.DataFrame()
-    
+
     # find the rows with human labels
     for it in target_label:
         #print(it + " >> " + select_rows.LabelName)
         # human_row = selected_rows.loc([selected_rows.LabelName == it) & (selected_rows.IsDepiction == 0)]
-        for row in selected_rows:
+        for index, row in selected_rows.iterrows():
             flag_good = True
+
+            if row['IsDepiction'] == 1:
+                return pd.DataFrame() # Abort!! this is a drawing and there is errors in input data set
 
             if row['LabelName'] != it:
                 continue
-            
-            if row['IsDepiction'] == 1:
-                continue
-
+                
             if row['IsGroupOf'] == 1:
                 continue
         
-            if (len(my_rows.index) == 0):
-                my_rows = row
-            else:
-                my_rows.append(row)
+            my_rows = my_rows.append(row)
 
     if (DEBUG_MODE):
         print("\n")
