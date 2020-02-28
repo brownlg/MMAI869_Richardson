@@ -48,13 +48,13 @@ print("Completed loading model")
 
 # Run classifier
 results = my_model.predict(x_test)
-print(model.evaluate(x_test, y_test))
-print(model.metrics_names)
+print(my_model.evaluate(x_test, y_test))
+print(my_model.metrics_names)
 
 probas_ = [ 0 ]
 
 # Compute Precision-Recall and plot curve
-precision, recall, thresholds = precision_recall_curve(y[half:], probas_[:, 1])
+precision, recall, thresholds = precision_recall_curve(y_test, results[:, 1])
 area = auc(recall, precision)
 print ("Area Under Curve: %0.2f" % area)
 
