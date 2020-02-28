@@ -42,7 +42,7 @@ print('Number of images in y_test', y_test.shape[0])
 # load the trained neural network
 from keras.models import load_model
 
-model_name = "path_1_richardson_V3.h5"
+model_name = "path_1_richardson_Vtest.h5"
 my_model = load_model(model_name) 
 print("Completed loading model")
 

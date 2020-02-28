@@ -81,7 +81,7 @@ print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
 
 print("Saving model...")
-model.save('path_1_richardson_V2.h5')
+model.save('path_1_richardson_Vtest.h5')
 
 print("deleting old file 1")
 if os.path.exists(os.path.join("trained_model_results", "test_results_summary.csv")):
