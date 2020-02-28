@@ -14,9 +14,14 @@ from Richardson_Logger import r_logger
 WINDOW_X = 80
 WINDOW_Y = 80
 
+detector_threshold = 0.9999
+
 # load the trained neural network
 from keras.models import load_model
-my_model = load_model("path_1_richardson_V2.h5") 
+
+model_name = "path_1_richardson_V2.h5"
+
+my_model = load_model(model_name) 
 #my_model = load_model("stream2_lb_classifier.h5") 
 print("Completed loading model")
 
@@ -81,7 +86,7 @@ def process_image(my_image, img_index, my_logger, true_bounding_boxes):
     print("Prediction completed for image using grid clips")
 
     #filter for results that meet threshold for the object detector
-    detector_threshold = 0.95
+    
     results_true = []
     for index in range(0, len(results)):
         result = results[index]
@@ -194,6 +199,8 @@ files = file_handler.get_file_list(my_paths.TTC_PATH)
 
 my_logger = r_logger.R_logger(os.path.join("richardson_info_files", "obj_mAP_values.csv"))
 my_logger.clear()
+my_logger.write_line("Detector threshold: " + str(detector_threshold) + "\n")
+my_logger.write_line("Model Name: " + model_name + "\n")
 my_logger.write_line("imageid, boundingbox_id, IOU, sourceimage\n")
 
 img_index=0
