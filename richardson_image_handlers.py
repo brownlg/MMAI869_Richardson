@@ -242,7 +242,12 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
             #  file_handler.save_image("boutput.png", "", target2, True)           
     
     # second add the false targets
-    list_of_boxes = create_list_of_false_clips(200, FALSE_RATIO, my_img, target_rows, window_x, window_y)
+    if "use for TTC background" in img_id:
+        my_false_ratio = 1000
+    else:
+        my_false_ratio = FALSE_RATIO
+
+    list_of_boxes = create_list_of_false_clips(400, my_false_ratio, my_img, target_rows, window_x, window_y)
 
     for box in list_of_boxes:
         # calculate the bounds with the window size
