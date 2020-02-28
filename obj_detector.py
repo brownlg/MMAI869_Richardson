@@ -14,12 +14,12 @@ from Richardson_Logger import r_logger
 WINDOW_X = 80
 WINDOW_Y = 80
 
-detector_threshold = 0.9999
+detector_threshold = 0.99999
 
 # load the trained neural network
 from keras.models import load_model
 
-model_name = "path_1_richardson_V2.h5"
+model_name = "path_1_richardson_V3.h5"
 
 my_model = load_model(model_name) 
 #my_model = load_model("stream2_lb_classifier.h5") 

@@ -54,27 +54,31 @@ from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 # Creating a Sequential Model and adding the layers
 model = Sequential()
 model.add(Conv2D(64, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Conv2D(128, kernel_size=(6, 6), strides=2, activation='relu', padding = 'same', input_shape=input_shape))
 model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+model.add(Conv2D(128, kernel_size=(6, 6), strides=6, activation='relu', padding = 'same', input_shape=input_shape))
 model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+
 
 model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+model.add(Dense(128, activation=tf.nn.relu))
 model.add(Dense(64, activation=tf.nn.relu))
-model.add(Dropout(0.2))
+
+#v3:
+model.add(Dropout(0.4))
 model.add(Dense(2, activation='softmax'))  
 
 model.compile(optimizer='adam', 
               loss='sparse_categorical_crossentropy', 
+             # loss='binary_crossentropy',
               metrics=['accuracy' ])
 
 model.fit(x=x_train, y=y_train, batch_size = 100, epochs = 20)
 
-#print(model.evaluate(x_test, y_test))
-#print(model.metrics_names)
+print(model.evaluate(x_test, y_test))
+print(model.metrics_names)
 
 print("Saving model...")
 model.save('path_1_richardson_V2.h5')

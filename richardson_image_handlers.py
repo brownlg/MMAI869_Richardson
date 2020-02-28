@@ -97,10 +97,10 @@ def create_list_of_false_clips(max_try, number_of_clips, my_img, target_rows, wi
         x_min = int (random.randint(0, width-window_x))
 
         # not needed anymore: 
-        # y_max = random.gauss(window_y, window_y / 6.0) + y_min
-        # x_max = random.gauss(window_x, window_x / 3.0) + x_min
-        y_max = window_y + y_min
-        x_max = window_x + x_min
+        y_max = random.gauss(window_y, window_y / 10.0) + y_min
+        x_max = random.gauss(window_x, window_x / 10.0) + x_min
+        #y_max = window_y + y_min
+        #x_max = window_x + x_min
 
         #exception handling, should not happen
         if (y_max > height): 
@@ -243,11 +243,11 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
     
     # second add the false targets
     if "use for TTC background" in img_id:
-        my_false_ratio = 1000
+        my_false_ratio = 2
     else:
         my_false_ratio = FALSE_RATIO
 
-    list_of_boxes = create_list_of_false_clips(400, my_false_ratio, my_img, target_rows, window_x, window_y)
+    list_of_boxes = create_list_of_false_clips(2, my_false_ratio, my_img, target_rows, window_x, window_y)
 
     for box in list_of_boxes:
         # calculate the bounds with the window size
