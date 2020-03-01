@@ -11,6 +11,14 @@ import richardson_file_handlers as file_handler
 import richardson_image_handlers as image_handler
 from Richardson_Logger import r_logger
 
+import random
+import pylab as pl
+import numpy as np
+from sklearn import svm, datasets
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import auc
+
+
 #dimensions of input image
 WINDOW_X = 80
 WINDOW_Y = 80
@@ -53,35 +61,124 @@ from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 
 # Creating a Sequential Model and adding the layers
 model = Sequential()
-model.add(Conv2D(64, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Conv2D(128, kernel_size=(6, 6), strides=2, activation='relu', padding = 'same', input_shape=input_shape))
-model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
-model.add(Conv2D(128, kernel_size=(6, 6), strides=6, activation='relu', padding = 'same', input_shape=input_shape))
-model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+
+model_version = 2
+if model_version == 1:  # our base model     
+    # convolution layer 1
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    
+    # convolution layer 2
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    
+    # dense layer
+    model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+    model.add(Dense(64, activation=tf.nn.relu))
+
+    #v3:
+    model.add(Dropout(0.4))
+    model.add(Dense(2, activation='softmax'))  
+
+    model.compile(optimizer='adam', 
+                loss='sparse_categorical_crossentropy', 
+                # loss='binary_crossentropy',
+                metrics=['accuracy' ])
+    batch_size = 100
+    my_epochs = 20
+
+if model_version == 2: #saved it is the best far
+    model.add(Conv2D(64, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))    
+    model.add(MaxPooling2D(pool_size=(2, 2)))    
+    model.add(Conv2D(128, kernel_size=(6, 6), strides=(3,3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(MaxPooling2D(pool_size=(2, 2)))    
+    model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+    model.add(Dense(64, activation=tf.nn.relu))
+    #v3:
+    model.add(Dropout(0.2))
+    model.add(Dense(2, activation='softmax'))  
+    batch_size = 100
+    my_epochs = 10
+
+if model_version == 3:
+    model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(MaxPooling2D(pool_size=(2, 2)))            
+    model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))        
+    model.add(Conv2D(64, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(5, 5), strides=(2,2), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))      
+    model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+    model.add(Dense(64, activation=tf.nn.relu))    
+    model.add(Dense(31, activation=tf.nn.relu))    
+    #v3:
+    model.add(Dropout(0.1))
+    model.add(Dense(2, activation='softmax')) 
+
+    batch_size = 50
+    my_epochs = 20
+
+if model_version == 4: #saved it is the best far
+    model.add(Conv2D(64, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))    
+    model.add(MaxPooling2D(pool_size=(2, 2)))    
+    model.add(Conv2D(128, kernel_size=(6, 6), strides=(3,3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(MaxPooling2D(pool_size=(2, 2)))    
+    model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+    model.add(Dense(64, activation=tf.nn.relu))
+    #v3:
+    model.add(Dropout(0.2))
+    model.add(Dense(2, activation='softmax'))  
+    batch_size = 100
+    my_epochs = 30
 
 
-model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
-model.add(Dense(128, activation=tf.nn.relu))
-model.add(Dense(64, activation=tf.nn.relu))
+if model_version == 5: # just trying different params on model #4
+    model.add(Conv2D(64, kernel_size=(1, 1), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))    
+    model.add(MaxPooling2D(pool_size=(2, 2)))    
+    model.add(Conv2D(128, kernel_size=(6, 6), strides=(3,3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding = 'same', input_shape=input_shape))
+    model.add(MaxPooling2D(pool_size=(2, 2)))    
+    model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+    model.add(Dense(64, activation=tf.nn.relu))
+    
+    #model.add(Dropout(0.0))
+    model.add(Dense(2, activation='softmax'))  
+    batch_size = 20
+    my_epochs = 30
 
-#v3:
-model.add(Dropout(0.4))
-model.add(Dense(2, activation='softmax'))  
+
+model.summary()
 
 model.compile(optimizer='adam', 
-              loss='sparse_categorical_crossentropy', 
-             # loss='binary_crossentropy',
-              metrics=['accuracy' ])
+            loss='sparse_categorical_crossentropy', 
+            # loss='binary_crossentropy',
+            metrics=['accuracy' ])
 
-model.fit(x=x_train, y=y_train, batch_size = 100, epochs = 20)
+
+model.fit(x=x_train, y=y_train, batch_size = batch_size, epochs = my_epochs, validation_split=0.2)
 
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
 
+# Compute Precision-Recall and plot curve
+results = model.predict(x_test)
+precision, recall, thresholds = precision_recall_curve(y_test, results[:, 1])
+area = auc(recall, precision)
+print ("Area Under Curve: %0.4f" % area)
+
+
 print("Saving model...")
-model.save('path_1_richardson_Vtest.h5')
+model.save('path_1_richardson_X' + str(model_version) +  '.h5')
 
 print("deleting old file 1")
 if os.path.exists(os.path.join("trained_model_results", "test_results_summary.csv")):
@@ -93,8 +190,10 @@ for filename in os.listdir(os.path.join("trained_model_results" , PATH_CORRECT))
 	os.remove(os.path.join("trained_model_results", PATH_CORRECT, filename))
 
 print("Predicting results")
-results = model.predict(x_test)
+
 print(results)
+
+
 
 print("Saving results")
 np.savetxt(os.path.join("trained_model_results", "test_results_summary.csv"), results, delimiter = ',')

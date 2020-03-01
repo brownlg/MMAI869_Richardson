@@ -25,7 +25,7 @@ WINDOW_Y = 80
 
 # load test data
 print("Loading images for test...")
-x_test, x_test_files = file_handler.load_images_for_keras(my_paths.VALIDATION_PATH, "png", 100000, WINDOW_X, WINDOW_Y, num_channels=3)
+x_test, x_test_files = file_handler.load_images_for_keras(my_paths.VALIDATION_PATH, "png", 100000, WINDOW_X, WINDOW_Y, num_channels=3, scale=True)
 x_test = x_test / 255
 
 print("Loading dictionary for y_train...")
@@ -42,7 +42,7 @@ print('Number of images in y_test', y_test.shape[0])
 # load the trained neural network
 from keras.models import load_model
 
-model_name = "path_1_richardson_Vtest.h5"
+model_name = "path_1_richardson_X1.h5"
 my_model = load_model(model_name) 
 print("Completed loading model")
 
@@ -51,13 +51,10 @@ results = my_model.predict(x_test)
 print(my_model.evaluate(x_test, y_test))
 print(my_model.metrics_names)
 
-probas_ = [ 0 ]
-
 # Compute Precision-Recall and plot curve
 precision, recall, thresholds = precision_recall_curve(y_test, results[:, 1])
 area = auc(recall, precision)
-print ("Area Under Curve: %0.2f" % area)
-
+print ("Area Under Curve: %0.5f" % area)
 
 pl.clf()
 pl.plot(recall, precision, label='Precision-Recall curve')
@@ -65,10 +62,9 @@ pl.xlabel('Recall')
 pl.ylabel('Precision')
 pl.ylim([0.0, 1.05])
 pl.xlim([0.0, 1.0])
-pl.title('Precision-Recall example: AUC=%0.2f' % area)
+pl.title('Precision-Recall: AUC=%0.5f' % area)
 pl.legend(loc="lower left")
 pl.show()
 
-
-
+# output to file
 

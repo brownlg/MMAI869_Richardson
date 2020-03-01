@@ -14,12 +14,12 @@ from Richardson_Logger import r_logger
 WINDOW_X = 80
 WINDOW_Y = 80
 
-detector_threshold = 0.99999
+detector_threshold = 0.9999
 
 # load the trained neural network
 from keras.models import load_model
 
-model_name = "path_1_richardson_V3.h5"
+model_name = "path_1_richardson_X2.h5"
 
 my_model = load_model(model_name) 
 #my_model = load_model("stream2_lb_classifier.h5") 
@@ -179,13 +179,14 @@ def process_image(my_image, img_index, my_logger, true_bounding_boxes):
     fontColor              = (255,255,255)
     lineType               = 2
 
+    '''
     cv2.putText(my_image, 'Average IoU: ' + str(iou), 
         bottomLeftCornerOfText, 
         font, 
         fontScale,
         fontColor,
         lineType)
-        
+    '''     
     #save image with bounding boxes to output folder       
     file_handler.save_image('obj_detected' + str(img_index) +'.png', path = my_paths.OBJ_TEST_RESULTS, image_data = my_image, flag_png = True, remove_color = False)
    

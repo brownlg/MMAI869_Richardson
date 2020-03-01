@@ -1,0 +1,231 @@
+Detector threshold: 0.99999
+Model Name: path_1_richardson_V1.h5
+imageid, boundingbox_id, IOU, sourceimage
+0,-1,-1.0,Frame-00094.png
+0,-1,-1.0,Frame-00094.png
+0,-1,-1.0,Frame-00094.png
+0,-1,-1.0,Frame-00094.png
+0,-1,-1.0,Frame-00094.png
+1,-1,-1.0,Frame-00217.png
+1,-1,-1.0,Frame-00217.png
+2,-1,-1.0,Frame-00351.png
+2,-1,-1.0,Frame-00351.png
+2,-1,-1.0,Frame-00351.png
+3,-1,-1.0,Frame-00431.png
+3,-1,-1.0,Frame-00431.png
+3,-1,-1.0,Frame-00431.png
+3,-1,-1.0,Frame-00431.png
+4,2262,0.7746401985111663,Frame-00527.png
+4,3489,0.0,Frame-00527.png
+4,-1,0.0,Frame-00527.png
+4,-1,0.0,Frame-00527.png
+4,-1,0.0,Frame-00527.png
+5,720,0.0,Frame-00871.png
+5,1455,0.23750548967940271,Frame-00871.png
+5,2191,0.0,Frame-00871.png
+5,2383,0.04441415346169137,Frame-00871.png
+5,-1,0.0,Frame-00871.png
+5,-1,0.0,Frame-00871.png
+6,-1,-1.0,Frame-00923.png
+7,2133,0.0,Frame-00949.png
+7,2289,-0.0,Frame-00949.png
+7,-1,0.0,Frame-00949.png
+7,-1,-0.0,Frame-00949.png
+7,-1,0.0,Frame-00949.png
+7,-1,0.0,Frame-00949.png
+7,-1,0.0,Frame-00949.png
+7,-1,0.0,Frame-00949.png
+8,2133,0.0,Frame-01038.png
+8,2289,0.02156262478370824,Frame-01038.png
+8,2381,0.0,Frame-01038.png
+8,3487,0.0,Frame-01038.png
+8,-1,-0.0,Frame-01038.png
+8,-1,0.0,Frame-01038.png
+8,-1,0.0,Frame-01038.png
+8,-1,0.0,Frame-01038.png
+9,-1,-1.0,Frame-01318.png
+9,-1,-1.0,Frame-01318.png
+9,-1,-1.0,Frame-01318.png
+10,2456,0.0,Frame-01551.png
+10,3018,-0.0,Frame-01551.png
+10,-1,0.0,Frame-01551.png
+10,-1,0.0,Frame-01551.png
+10,-1,-0.0,Frame-01551.png
+10,-1,-0.0,Frame-01551.png
+10,-1,0.0,Frame-01551.png
+11,-1,-1.0,Frame-01598.png
+11,-1,-1.0,Frame-01598.png
+11,-1,-1.0,Frame-01598.png
+11,-1,-1.0,Frame-01598.png
+11,-1,-1.0,Frame-01598.png
+11,-1,-1.0,Frame-01598.png
+12,2265,0.6127636560302866,Frame-01646.png
+12,2338,0.47937436570950986,Frame-01646.png
+12,2456,0.0,Frame-01646.png
+12,-1,-0.0,Frame-01646.png
+12,-1,-0.0,Frame-01646.png
+12,-1,-0.0,Frame-01646.png
+13,2359,-0.0,Frame-01665.png
+13,2456,0.0,Frame-01665.png
+13,-1,0.0,Frame-01665.png
+13,-1,-0.0,Frame-01665.png
+13,-1,-0.0,Frame-01665.png
+13,-1,-0.0,Frame-01665.png
+14,-1,-1.0,Frame-01790.png
+14,-1,-1.0,Frame-01790.png
+15,-1,-1.0,Frame-01809.png
+15,-1,-1.0,Frame-01809.png
+16,-1,-1.0,Frame-01849.png
+16,-1,-1.0,Frame-01849.png
+16,-1,-1.0,Frame-01849.png
+16,-1,-1.0,Frame-01849.png
+17,3018,-0.0,Frame-01881.png
+17,-1,0.0,Frame-01881.png
+17,-1,-0.0,Frame-01881.png
+17,-1,-0.0,Frame-01881.png
+17,-1,-0.0,Frame-01881.png
+18,857,0.7076923076923077,Frame-01955.png
+18,2308,0.13695090439276486,Frame-01955.png
+18,-1,0.0,Frame-01955.png
+18,-1,0.0,Frame-01955.png
+19,-1,-1.0,Frame-02325.png
+19,-1,-1.0,Frame-02325.png
+19,-1,-1.0,Frame-02325.png
+19,-1,-1.0,Frame-02325.png
+19,-1,-1.0,Frame-02325.png
+20,-1,-1.0,Frame-02435.png
+20,-1,-1.0,Frame-02435.png
+20,-1,-1.0,Frame-02435.png
+20,-1,-1.0,Frame-02435.png
+20,-1,-1.0,Frame-02435.png
+21,3050,0.4793059822880896,Frame-02451.png
+21,-1,-0.0,Frame-02451.png
+21,-1,-0.0,Frame-02451.png
+21,-1,-0.0,Frame-02451.png
+21,-1,-0.0,Frame-02451.png
+21,-1,-0.0,Frame-02451.png
+22,-1,-1.0,Frame-03033.png
+22,-1,-1.0,Frame-03033.png
+22,-1,-1.0,Frame-03033.png
+22,-1,-1.0,Frame-03033.png
+22,-1,-1.0,Frame-03033.png
+22,-1,-1.0,Frame-03033.png
+22,-1,-1.0,Frame-03033.png
+23,989,0.591952540624194,Frame-03418.png
+23,2329,0.5424870170632883,Frame-03418.png
+23,2332,0.1362942871673165,Frame-03418.png
+23,-1,-0.0,Frame-03418.png
+23,-1,-0.0,Frame-03418.png
+23,-1,0.0,Frame-03418.png
+23,-1,0.0,Frame-03418.png
+23,-1,-0.0,Frame-03418.png
+25,912,0.0,Frame-03450.png
+25,2380,0.0,Frame-03450.png
+26,2458,0.0,Frame-03475.png
+27,2304,0.7398959583833533,Frame-03578.png
+27,2758,0.29449116183284707,Frame-03578.png
+27,-1,-0.0,Frame-03578.png
+27,-1,0.0,Frame-03578.png
+27,-1,-0.0,Frame-03578.png
+27,-1,-0.0,Frame-03578.png
+29,2236,0.0,Frame-03602.png
+29,2304,0.0,Frame-03602.png
+30,-1,-1.0,Frame-03621.png
+30,-1,-1.0,Frame-03621.png
+30,-1,-1.0,Frame-03621.png
+30,-1,-1.0,Frame-03621.png
+30,-1,-1.0,Frame-03621.png
+31,2265,0.0,Frame-03631.png
+32,-1,-1.0,Frame-03806.png
+33,1752,0.0,Frame-03862.png
+33,2362,0.0,Frame-03862.png
+34,3065,0.0,Frame-03952.png
+34,-1,-0.0,Frame-03952.png
+34,-1,-0.0,Frame-03952.png
+34,-1,0.0,Frame-03952.png
+34,-1,0.0,Frame-03952.png
+34,-1,0.0,Frame-03952.png
+35,1244,0.18661787767903815,Frame-03992.png
+35,-1,-0.0,Frame-03992.png
+35,-1,-0.0,Frame-03992.png
+36,2971,0.016283388087416084,Frame-04033.png
+36,3446,0.0,Frame-04033.png
+36,-1,-0.0,Frame-04033.png
+36,-1,0.0,Frame-04033.png
+36,-1,-0.0,Frame-04033.png
+36,-1,-0.0,Frame-04033.png
+36,-1,-0.0,Frame-04033.png
+36,-1,-0.0,Frame-04033.png
+37,2336,0.0,Frame-04043.png
+37,2698,0.0,Frame-04043.png
+38,-1,-1.0,Frame-04113.png
+38,-1,-1.0,Frame-04113.png
+38,-1,-1.0,Frame-04113.png
+38,-1,-1.0,Frame-04113.png
+38,-1,-1.0,Frame-04113.png
+40,-1,-1.0,Frame-04774.png
+40,-1,-1.0,Frame-04774.png
+41,2256,0.1586443122408509,Frame-05344.png
+41,-1,-0.0,Frame-05344.png
+41,-1,0.0,Frame-05344.png
+41,-1,-0.0,Frame-05344.png
+41,-1,-0.0,Frame-05344.png
+41,-1,-0.0,Frame-05344.png
+42,1000,-0.0,Frame-05437.png
+42,-1,-0.0,Frame-05437.png
+42,-1,0.0,Frame-05437.png
+42,-1,-0.0,Frame-05437.png
+43,987,0.0,Frame-05457.png
+43,1839,-0.0,Frame-05457.png
+43,2241,0.1759676172283622,Frame-05457.png
+43,-1,-0.0,Frame-05457.png
+44,-1,-1.0,Frame-05480.png
+44,-1,-1.0,Frame-05480.png
+45,2312,0.6654078201998802,Frame-05502.png
+45,2457,-0.0,Frame-05502.png
+45,-1,-0.0,Frame-05502.png
+46,-1,-1.0,Frame-05549.png
+46,-1,-1.0,Frame-05549.png
+47,-1,-1.0,Frame-05600.png
+47,-1,-1.0,Frame-05600.png
+48,2285,0.5635013677217663,Frame-05646-boyfriend.png
+50,1937,0.0,IMG-20200109-WA0000.jpg
+50,3378,0.0,IMG-20200109-WA0000.jpg
+50,5086,0.0,IMG-20200109-WA0000.jpg
+50,6941,0.0,IMG-20200109-WA0000.jpg
+50,6979,0.0,IMG-20200109-WA0000.jpg
+50,7110,0.0,IMG-20200109-WA0000.jpg
+51,598,0.0,IMG-20200109-WA0001.jpg
+51,2485,0.0,IMG-20200109-WA0001.jpg
+51,2824,0.0,IMG-20200109-WA0001.jpg
+51,2890,0.0,IMG-20200109-WA0001.jpg
+51,5298,0.0,IMG-20200109-WA0001.jpg
+51,5345,0.0,IMG-20200109-WA0001.jpg
+51,5786,0.0,IMG-20200109-WA0001.jpg
+51,6394,0.0,IMG-20200109-WA0001.jpg
+51,6438,0.0,IMG-20200109-WA0001.jpg
+51,6535,0.0,IMG-20200109-WA0001.jpg
+51,6616,0.0,IMG-20200109-WA0001.jpg
+51,6749,0.0,IMG-20200109-WA0001.jpg
+51,6872,0.0,IMG-20200109-WA0001.jpg
+51,7162,0.0,IMG-20200109-WA0001.jpg
+52,598,0.0,Photo from Luke(1).jpg
+52,2485,0.0,Photo from Luke(1).jpg
+52,2824,0.0,Photo from Luke(1).jpg
+52,2890,0.0,Photo from Luke(1).jpg
+52,5298,0.0,Photo from Luke(1).jpg
+52,5345,0.0,Photo from Luke(1).jpg
+52,5786,0.0,Photo from Luke(1).jpg
+52,6394,0.0,Photo from Luke(1).jpg
+52,6438,0.0,Photo from Luke(1).jpg
+52,6535,0.0,Photo from Luke(1).jpg
+52,6616,0.0,Photo from Luke(1).jpg
+52,6749,0.0,Photo from Luke(1).jpg
+52,6872,0.0,Photo from Luke(1).jpg
+52,7162,0.0,Photo from Luke(1).jpg
+53,1937,0.0,Photo from Luke.jpg
+53,3378,0.0,Photo from Luke.jpg
+53,5086,0.0,Photo from Luke.jpg
+53,6941,0.0,Photo from Luke.jpg
+53,6979,0.0,Photo from Luke.jpg
+53,7110,0.0,Photo from Luke.jpg
