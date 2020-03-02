@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 WINDOW_X = 128
 WINDOW_Y = 128
 
-max_images = 200000
+max_images = 5000
 
 print("Loading dictionary for y_train...")
 my_logger = r_logger.R_logger(my_paths.INFO_PATH + '\\' + "data.csv")
@@ -107,14 +107,14 @@ model.compile(optimizer='adam',
               metrics=['accuracy' ])
 
 
-model.fit(x=x_train, y=y_train, batch_size = 100, epochs = 20)
+model.fit(x=x_train, y=y_train, batch_size = 100, epochs = 3, validation_split= 0.2)
 
 
 print(model.evaluate(x_test, y_test))
 print(model.metrics_names)
 
 print("Saving model")
-model.save('stream2_lb_classifier.h5')
+model.save('stream2_lb_classifier_Y1.h5')
 
 
 print("deleting old file 1")

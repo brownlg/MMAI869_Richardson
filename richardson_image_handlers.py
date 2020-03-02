@@ -7,7 +7,7 @@ from bbox.metrics import jaccard_index_2d, BBox2D
 import richardson_path
 
 BLUR_SIZE = 21
-FALSE_RATIO = 1
+FALSE_RATIO = 2
 
 
 print(cv2.__version__)
@@ -247,7 +247,7 @@ def create_clipped_images(img_id, filepath, target_rows, window_x, window_y):
     else:
         my_false_ratio = FALSE_RATIO
 
-    list_of_boxes = create_list_of_false_clips(2000, my_false_ratio, my_img, target_rows, window_x, window_y)
+    list_of_boxes = create_list_of_false_clips(4000, my_false_ratio, my_img, target_rows, window_x, window_y)
 
     for box in list_of_boxes:
         # calculate the bounds with the window size

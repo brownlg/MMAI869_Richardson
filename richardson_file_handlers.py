@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import cv2
 import scipy as scipy
-
+import random
 import os
 import glob
 from keras.preprocessing.image import load_img
@@ -116,10 +116,12 @@ def load_images_for_keras(file_path="", ext = "jpg", max_limit = 15000000, windo
         if (val is not None) and (".txt" not in val):
             res.append(val) 
 
+    # shuffle files
+    file_list = random.shuffle(file_list)
+
     file_list = res
 
     number_of_files = len(file_list) 
-
     number_of_files = min(number_of_files, max_limit)
 
     #create numpy array for files

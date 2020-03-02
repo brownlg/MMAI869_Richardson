@@ -1,17 +1,20 @@
-Detector threshold: 0.9999
+Detector threshold: 0.995
 Model Name: path_1_richardson_X2.h5
 imageid, boundingbox_id, IOU, sourceimage
+0,522,0.0,A_IMG_48492.jpg
+0,654,0.0,A_IMG_48492.jpg
+0,959,0.0,A_IMG_48492.jpg
+0,1202,0.0,A_IMG_48492.jpg
+0,1687,0.0,A_IMG_48492.jpg
+0,1715,0.0,A_IMG_48492.jpg
+0,2029,0.0,A_IMG_48492.jpg
 1,878,0.01601148409893993,Frame-00094.png
-1,-1,0.0,Frame-00094.png
+1,2306,0.23615499750540495,Frame-00094.png
+1,3115,0.1771744132535665,Frame-00094.png
 1,-1,0.0,Frame-00094.png
 1,-1,-0.0,Frame-00094.png
-1,-1,0.0,Frame-00094.png
-2,-1,-1.0,Frame-00217.png
-2,-1,-1.0,Frame-00217.png
-3,-1,-1.0,Frame-00351.png
-3,-1,-1.0,Frame-00351.png
-3,-1,-1.0,Frame-00351.png
-4,3240,0.4804270462633452,Frame-00431.png
-4,-1,-0.0,Frame-00431.png
-4,-1,-0.0,Frame-00431.png
-4,-1,-0.0,Frame-00431.png
+2,2423,0.7313965341488278,Frame-00217.png
+2,3330,0.2701863354037267,Frame-00217.png
+3,2066,0.36263128800442235,Frame-00351.png
+3,2431,0.4211285379484406,Frame-00351.png
+3,3368,0.29104897729405144,Frame-00351.png

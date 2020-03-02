@@ -14,7 +14,7 @@ from Richardson_Logger import r_logger
 WINDOW_X = 80
 WINDOW_Y = 80
 
-detector_threshold = 0.9999
+detector_threshold = 0.995
 
 # load the trained neural network
 from keras.models import load_model

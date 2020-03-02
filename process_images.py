@@ -19,7 +19,7 @@ TRAIN_TEST_VALIDATION_DISTRIBUTION = (0.8, 0.0, 0.2)
 IMG_WINDOW_X = 80
 IMG_WINDOW_Y = 80
 
-COLLECT_MAX = 10000  #select how many images you want total
+COLLECT_MAX = 5000  #select how many images you want total
 
 #get list of images to load, based on jpg in file directory
 #img_list = get_file_list(DATA_PATH)

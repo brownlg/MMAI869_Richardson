@@ -192,9 +192,6 @@ for filename in os.listdir(os.path.join("trained_model_results" , PATH_CORRECT))
 print("Predicting results")
 
 print(results)
-
-
-
 print("Saving results")
 np.savetxt(os.path.join("trained_model_results", "test_results_summary.csv"), results, delimiter = ',')
 files_txt = r_logger.R_logger(os.path.join("trained_model_results", "test_results_summary.csv"))
@@ -211,6 +208,7 @@ import operator
 
 result_table.sort(key = operator.itemgetter(0))
 
+# store output for analysis
 for iter in result_table:
     file_name = iter[2]
     prob_correct = str(int(round(iter[0]*100, 0))).zfill(3)
