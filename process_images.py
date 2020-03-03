@@ -33,15 +33,20 @@ print("deleting csv file")
 if os.path.exists(os.path.join("richardson_info_files", "data.csv")):
 	os.remove(os.path.join("richardson_info_files", "data.csv"))
 
-print("deleting old sample files 1/3")
-for filename in os.listdir(os.path.join("richardson_images_train_set")):
-	os.remove(os.path.join("richardson_images_train_set", filename))
-print("deleting old sample files 2/3")
-for filename in os.listdir(os.path.join("richardson_images_validation_set")):
-	os.remove(os.path.join("richardson_images_validation_set", filename))
-print("deleting old sample files 3/3")
-for filename in os.listdir(os.path.join("richardson_images_test_set")):
-	os.remove(os.path.join("richardson_images_test_set", filename))
+if os.path.exists(os.path.join("richardson_images_train_set", "data.csv")):
+	print("deleting old sample files 1/3")
+	for filename in os.listdir(os.path.join("richardson_images_train_set")):
+		os.remove(os.path.join("richardson_images_train_set", filename))
+
+if os.path.exists(os.path.join("richardson_images_validation_set", "data.csv")):
+	print("deleting old sample files 2/3")
+	for filename in os.listdir(os.path.join("richardson_images_validation_set")):
+		os.remove(os.path.join("richardson_images_validation_set", filename))
+
+if os.path.exists(os.path.join("richardson_images_test_set", "data.csv")):
+	print("deleting old sample files 3/3")
+	for filename in os.listdir(os.path.join("richardson_images_test_set")):
+		os.remove(os.path.join("richardson_images_test_set", filename))
 
 # get list of images to load, based on jpg in file directory
 # get list of images with human labels first

@@ -14,3 +14,18 @@ data.csv*
 richardson_info_files/data.csv
 richardson_info_files/data.csv
 richardson_info_files/data.csv
+
+# But not these files...
+![target_dir\\validation]\\use for TTC background.jpg
+![target_dir\\validation]\\0013ea2087020901.jpg
+![target_dir\\validation]\\00146ba1e50ed8d8.jpg
+![target_dir\\validation]\\001997021f01f208.jpg
+![target_dir\\validation]\\006f87bf928f9ba3.jpg
+![target_dir\\validation]\\00a42a80e5e8d194.jpg
+![target_dir\\validation]\\00e65d13159b498b.jpg
+![target_dir\\validation]\\00eb69293aa4c5b7.jpg
+![target_dir\\validation]\\00ec4ba83d648c33.jpg
+![target_dir\\validation]\\00fd93edd4717826.jpg
+![target_dir\\validation]\\010d9a7f0d2e0622.jpg
+![target_dir\\validation]\\01125dd72c09cc5a.jpg
+# etc...
