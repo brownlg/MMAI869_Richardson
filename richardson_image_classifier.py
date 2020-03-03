@@ -178,7 +178,7 @@ print ("Area Under Curve: %0.4f" % area)
 
 
 print("Saving model...")
-model.save('path_1_richardson_X' + str(model_version) +  '.h5')
+model.save('path_1_richardson_sX' + str(model_version) +  '.h5')
 
 print("deleting old file 1")
 if os.path.exists(os.path.join("trained_model_results", "test_results_summary.csv")):
@@ -186,6 +186,13 @@ if os.path.exists(os.path.join("trained_model_results", "test_results_summary.cs
 
 print("deleting old result files")
 PATH_CORRECT = "prediction_is_correct"
+
+if os.path.exists('trained_model_results') == False:
+	os.mkdir('trained_model_results')
+
+if os.path.exists(os.path.join("trained_model_results" , PATH_CORRECT)) == False:
+    os.mkdir(os.path.join("trained_model_results" , PATH_CORRECT))
+
 for filename in os.listdir(os.path.join("trained_model_results" , PATH_CORRECT)):
 	os.remove(os.path.join("trained_model_results", PATH_CORRECT, filename))
 

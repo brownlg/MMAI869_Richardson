@@ -7,7 +7,7 @@ from bbox.metrics import jaccard_index_2d, BBox2D
 import richardson_path
 
 BLUR_SIZE = 21
-FALSE_RATIO = 2
+FALSE_RATIO = 10
 
 
 print(cv2.__version__)

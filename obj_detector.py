@@ -19,7 +19,7 @@ detector_threshold = 0.995
 # load the trained neural network
 from keras.models import load_model
 
-model_name = "path_1_richardson_X2.h5"
+model_name = "path_1_richardson_sX2.h5"
 
 my_model = load_model(model_name) 
 #my_model = load_model("stream2_lb_classifier.h5") 
@@ -188,11 +188,13 @@ def process_image(my_image, img_index, my_logger, true_bounding_boxes):
         lineType)
     '''     
     #save image with bounding boxes to output folder       
+    
     file_handler.save_image('obj_detected' + str(img_index) +'.png', path = my_paths.OBJ_TEST_RESULTS, image_data = my_image, flag_png = True, remove_color = False)
    
     return
 
-
+if os.path.exists(my_paths.OBJ_TEST_RESULTS) == False:
+	os.mkdir(my_paths.OBJ_TEST_RESULTS)
 
 my_model.summary()
 meta_data = data.get('_via_img_metadata')

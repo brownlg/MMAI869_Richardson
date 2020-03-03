@@ -48,6 +48,16 @@ if os.path.exists(os.path.join("richardson_images_test_set", "data.csv")):
 	for filename in os.listdir(os.path.join("richardson_images_test_set")):
 		os.remove(os.path.join("richardson_images_test_set", filename))
 
+if os.path.exists('richardson_images_train_set') == False:
+	os.mkdir('richardson_images_train_set')
+
+if os.path.exists('richardson_images_test_set') == False:
+	os.mkdir('richardson_images_test_set')
+
+if os.path.exists('richardson_images_validation_set') == False:
+	os.mkdir('richardson_images_validation_set')
+
+
 # get list of images to load, based on jpg in file directory
 # get list of images with human labels first
 # get the bounding boxes
